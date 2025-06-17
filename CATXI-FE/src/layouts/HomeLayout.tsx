@@ -1,24 +1,18 @@
 import { Outlet } from "react-router-dom";
-import TabBar from "../components/Tab/TabBar";
-import { ModalProvider } from "../contexts/ModalContext";
 
-const HomeLayout = () => {
+const MainLayout = () => {
   return (
-    <ModalProvider>
-      <div
-        className="
-          w-full
-          h-screen 
-          relative 
-          flex 
-          flex-col 
-          "
-      >
-        <Outlet />
-        <TabBar />
-      </div>
-    </ModalProvider>
+    <div 
+      className="
+        w-full 
+        h-screen 
+        relative 
+        flex 
+        flex-col 
+        ">
+      <Outlet />
+    </div>
   );
 };
 
-export default HomeLayout;
+export default MainLayout;
