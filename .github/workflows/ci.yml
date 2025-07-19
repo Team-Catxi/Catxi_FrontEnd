@@ -24,8 +24,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-          cache-dependency-path: Loopy-fe/pnpm-lock.yaml 
+          cache-dependency-path: CATXI-FE/pnpm-lock.yaml 
 
       - name: Install dependencies
-        working-directory: Loopy-fe 
+        working-directory: CATXI-FE
         run: pnpm install
