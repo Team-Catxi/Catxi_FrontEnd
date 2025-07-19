@@ -45,32 +45,32 @@ const ChatLayout = () => {
     [messages, myEmail, hostEmail, hostNickname, chatRoomDetail, nicknameMap, refetchChatRoomDetail]
   );
 
-  if (!roomId || isLoading) {
-    return (
-      <div className="flex justify-center items-center h-[90vh]">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-8 h-8 border-4 border-[#8C46F6] border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-gray-600">로딩 중입니다...</p>
-        </div>
-      </div>
-    );
-  }
+  // if (!roomId || isLoading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-[90vh]">
+  //       <div className="flex flex-col items-center gap-2">
+  //         <div className="w-8 h-8 border-4 border-[#8C46F6] border-t-transparent rounded-full animate-spin" />
+  //         <p className="text-sm text-gray-600">로딩 중입니다...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
-  if (isError || !chatRoomDetail) {
-    return (
-      <div className="flex justify-center items-center h-[90vh]">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <LogoText className="w-[10rem] h-auto" />
-          <button
-            onClick={() => navigate('/')}
-            className="px-8 py-2 bg-[#8C46F6] text-white rounded-full shadow hover:bg-[#722de2] transition"
-          >
-            retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // if (isError || !chatRoomDetail) {
+  //   return (
+  //     <div className="flex justify-center items-center h-[90vh]">
+  //       <div className="flex flex-col items-center gap-4 text-center">
+  //         <LogoText className="w-[10rem] h-auto" />
+  //         <button
+  //           onClick={() => navigate('/')}
+  //           className="px-8 py-2 bg-[#8C46F6] text-white rounded-full shadow hover:bg-[#722de2] transition"
+  //         >
+  //           retry
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="flex flex-col relative w-full min-h-screen bg-background overflow-hidden">

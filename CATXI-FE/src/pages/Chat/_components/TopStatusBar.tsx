@@ -1,10 +1,10 @@
-import { ChevronLeft } from 'lucide-react';
 import { useOutletContext, useParams, useNavigate } from 'react-router-dom';
+import { statusTextMap, statusColorMap } from '../../../constants/chatStatus';
 import type { ChatRoomDetail } from '../../../types/chat/chatRoomDetail';
 import { useLeaveChatRoom, useDeleteChatRoom } from '../../../hooks/mutation/chat/useChatDelete';
 import { useModal } from '../../../contexts/ModalContext';
 import LeaveRoomModal from '../../../components/Modal/LeaveRoomModal';
-import { queryClient } from '../../../App';
+import RoomOutIcon from '../../../assets/icons/RoomOut.svg?react';
 
 interface ChatContext {
   hostEmail: string;
@@ -18,20 +18,15 @@ const TopStatusBar = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { mutate: leaveRoom } = useLeaveChatRoom();
-  const { mutate: deleteRoom } = useDeleteChatRoom(); 
+  const { mutate: deleteRoom } = useDeleteChatRoom();
   const { openModal, closeModal } = useModal();
-  const current = (chatRoom?.currentSize ?? 0);
+
+  const current = chatRoom?.currentSize ?? 0;
   const total = (chatRoom?.recruitSize ?? 0) + 1;
-  const statusTextMap = { WAITING: '모집중', READY_LOCKED: '준비 완료', MATCHED: '매칭 완료', EXPIRED: '만료됨' };
-  const statusColorMap = { WAITING: '#7424F5', READY_LOCKED: '#08ACFF', MATCHED: '#1AD494', EXPIRED: '#D1D5DB' };
-  const statusText = chatRoom?.roomStatus ? statusTextMap[chatRoom.roomStatus] : '';
-  const statusColor = chatRoom?.roomStatus ? statusColorMap[chatRoom.roomStatus] : '#D1D5DB';
+  const status = chatRoom?.roomStatus;
+  const statusText = status ? statusTextMap[status] : '';
+  const statusColor = status ? statusColorMap[status] : '#D1D5DB';
   const isHost = myEmail === chatRoom?.hostEmail;
-  
-  const handleBackClick = () => { 
-    queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
-    navigate('/home') 
-  };
 
   const handleLeave = () => {
     if (!roomId) return;
@@ -58,7 +53,7 @@ const TopStatusBar = () => {
     if (!roomId) return;
     openModal(
       <LeaveRoomModal
-        type="delete" 
+        type="delete"
         onConfirm={() => {
           deleteRoom(Number(roomId), {
             onSuccess: () => {
@@ -78,7 +73,10 @@ const TopStatusBar = () => {
 
   return (
     <div className="w-full flex justify-between items-center py-6 px-[1.688rem]">
-      <button onClick={handleBackClick}><ChevronLeft size={20} /></button>
+      <button onClick={isHost ? handleDelete : handleLeave}>
+        <RoomOutIcon className="w-5 h-5" />
+      </button>
+
       <div className="font-medium text-[0.875rem] flex items-center gap-2">
         <span className="text-[0.5rem] ml-5" style={{ color: statusColor }}>●</span>
         <span className="text-gray-600 font-medium">
@@ -86,11 +84,7 @@ const TopStatusBar = () => {
         </span>
       </div>
 
-      {isHost ? (
-        <button className="text-sm text-gray-500" onClick={handleDelete}>삭제하기</button>
-      ) : (
-        <button className="text-sm text-gray-500" onClick={handleLeave}>나가기</button>
-      )}
+      <button className="text-sm text-gray-500">위치보기</button>
     </div>
   );
 };
