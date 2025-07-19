@@ -25,7 +25,7 @@ const publicRoutes = createBrowserRouter([
       { index: true, element: <Login />, handle: { isPublic: true } },
       {
         path: "chat/:roomId",
-        loader: AuthCheck.authPageCheck,
+        // loader: AuthCheck.authPageCheck,
         element: <ChatLayout />,
         children: [
           { index: true, element: <ChatPage /> }, // /chat

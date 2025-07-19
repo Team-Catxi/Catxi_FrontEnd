@@ -35,7 +35,13 @@ const DepartureInfoBox = () => {
 
   if (!chatRoom) return null;
 
-  if (['READY_LOCKED', 'MATCHED'].includes(chatRoom.roomStatus)) {
+  // 원래 코드로는 이걸 사용!
+  // if (['READY_LOCKED', 'MATCHED'].includes(chatRoom.roomStatus)) {
+  //   return <ReadyLockedBox departAt={chatRoom.departAt} />;
+  // }
+
+  // 테스트를 위한
+  if (['WAITING'].includes(chatRoom.roomStatus)) {
     return <ReadyLockedBox departAt={chatRoom.departAt} />;
   }
 
