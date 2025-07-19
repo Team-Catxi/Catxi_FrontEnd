@@ -1,5 +1,6 @@
 import { ChevronLeft } from 'lucide-react';
 import { useOutletContext, useParams, useNavigate } from 'react-router-dom';
+import { statusTextMap, statusColorMap } from '../../../constants/chatStatus';
 import type { ChatRoomDetail } from '../../../types/chat/chatRoomDetail';
 import { useLeaveChatRoom, useDeleteChatRoom } from '../../../hooks/mutation/chat/useChatDelete';
 import { useModal } from '../../../contexts/ModalContext';
@@ -18,19 +19,19 @@ const TopStatusBar = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { mutate: leaveRoom } = useLeaveChatRoom();
-  const { mutate: deleteRoom } = useDeleteChatRoom(); 
+  const { mutate: deleteRoom } = useDeleteChatRoom();
   const { openModal, closeModal } = useModal();
-  const current = (chatRoom?.currentSize ?? 0);
+
+  const current = chatRoom?.currentSize ?? 0;
   const total = (chatRoom?.recruitSize ?? 0) + 1;
-  const statusTextMap = { WAITING: '모집중', READY_LOCKED: '준비 완료', MATCHED: '매칭 완료', EXPIRED: '만료됨' };
-  const statusColorMap = { WAITING: '#7424F5', READY_LOCKED: '#08ACFF', MATCHED: '#1AD494', EXPIRED: '#D1D5DB' };
-  const statusText = chatRoom?.roomStatus ? statusTextMap[chatRoom.roomStatus] : '';
-  const statusColor = chatRoom?.roomStatus ? statusColorMap[chatRoom.roomStatus] : '#D1D5DB';
+  const status = chatRoom?.roomStatus;
+  const statusText = status ? statusTextMap[status] : '';
+  const statusColor = status ? statusColorMap[status] : '#D1D5DB';
   const isHost = myEmail === chatRoom?.hostEmail;
-  
-  const handleBackClick = () => { 
+
+  const handleBackClick = () => {
     queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
-    navigate('/home') 
+    navigate('/home');
   };
 
   const handleLeave = () => {
@@ -58,7 +59,7 @@ const TopStatusBar = () => {
     if (!roomId) return;
     openModal(
       <LeaveRoomModal
-        type="delete" 
+        type="delete"
         onConfirm={() => {
           deleteRoom(Number(roomId), {
             onSuccess: () => {
@@ -85,12 +86,9 @@ const TopStatusBar = () => {
           {statusText} ({current}/{total})
         </span>
       </div>
-
-      {isHost ? (
-        <button className="text-sm text-gray-500" onClick={handleDelete}>삭제하기</button>
-      ) : (
-        <button className="text-sm text-gray-500" onClick={handleLeave}>나가기</button>
-      )}
+      <button className="text-sm text-gray-500" onClick={isHost ? handleDelete : handleLeave}>
+        {isHost ? '삭제하기' : '나가기'}
+      </button>
     </div>
   );
 };

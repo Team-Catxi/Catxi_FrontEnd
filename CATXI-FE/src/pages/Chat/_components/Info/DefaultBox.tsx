@@ -25,7 +25,7 @@ const DefaultBox = ({ chatRoom, myEmail, onRequestReady }: Props) => {
   const displayEnd = stationDisplayMap[chatRoom.endPoint] ?? chatRoom.endPoint;
 
   return (
-    <div className="w-full bg-[#F5F5F5] rounded-xl px-[1.625rem] py-4.5 flex justify-between items-center mb-5">
+    <div className="w-full bg-[#F5F5F5] rounded-xl px-[1.625rem] py-[1rem] flex justify-between items-center mb-5">
       <div>
         <p className="text-[1.25rem] font-medium text-[#7424F5]">
           {`${displayStart} → ${displayEnd}`}

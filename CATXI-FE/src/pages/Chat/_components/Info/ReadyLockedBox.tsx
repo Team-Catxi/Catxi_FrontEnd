@@ -55,16 +55,16 @@ const ReadyLockedBox = ({ departAt }: Props) => {
   }, [departDate, remainingSec]);
 
   return (
-    <div className="w-full bg-[#F3F7FF] rounded-xl px-[1.625rem] py-[1.125rem] flex justify-between items-center mb-5">
+    <div className="w-full bg-[#7424F5] px-[1.625rem] py-[1rem] flex justify-between items-center mb-5">
       <div>
-        <p className="text-[1.25rem] font-medium text-[#3574FF]">{formattedTime}</p>
-        <p className="text-sm text-[#666]">위 시간까지 장소로 모여주세요!</p>
+        <p className="text-[1.25rem] font-semibold text-[#FAFAFA]">{formattedTime}</p>
+        <p className="text-[0.875rem] font-medium text-[#E6D8FF]">위 시간까지 장소로 모여주세요!</p>
       </div>
-      <div className="bg-white px-4 py-2 rounded-md text-center">
-        <p className="text-xs text-[#9E9E9E]">남은 시간</p>
+      <div className="px-4 py-2 text-center">
+        <p className="text-[0.75rem] font-regular text-[#F5F5F5]">남은 시간</p>
         <p
           className="text-[1.25rem] font-medium"
-          style={{ color: isUrgent ? '#FF5252' : '#424242' }}
+          style={{ color: isUrgent ? '#FF5252' : '#FAFAFA' }}
         >
           {remainText}
         </p>
