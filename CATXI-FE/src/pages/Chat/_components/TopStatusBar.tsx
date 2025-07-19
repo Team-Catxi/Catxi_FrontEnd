@@ -1,11 +1,10 @@
-import { ChevronLeft } from 'lucide-react';
 import { useOutletContext, useParams, useNavigate } from 'react-router-dom';
 import { statusTextMap, statusColorMap } from '../../../constants/chatStatus';
 import type { ChatRoomDetail } from '../../../types/chat/chatRoomDetail';
 import { useLeaveChatRoom, useDeleteChatRoom } from '../../../hooks/mutation/chat/useChatDelete';
 import { useModal } from '../../../contexts/ModalContext';
 import LeaveRoomModal from '../../../components/Modal/LeaveRoomModal';
-import { queryClient } from '../../../App';
+import RoomOutIcon from '../../../assets/icons/RoomOut.svg?react';
 
 interface ChatContext {
   hostEmail: string;
@@ -28,11 +27,6 @@ const TopStatusBar = () => {
   const statusText = status ? statusTextMap[status] : '';
   const statusColor = status ? statusColorMap[status] : '#D1D5DB';
   const isHost = myEmail === chatRoom?.hostEmail;
-
-  const handleBackClick = () => {
-    queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
-    navigate('/home');
-  };
 
   const handleLeave = () => {
     if (!roomId) return;
@@ -79,16 +73,18 @@ const TopStatusBar = () => {
 
   return (
     <div className="w-full flex justify-between items-center py-6 px-[1.688rem]">
-      <button onClick={handleBackClick}><ChevronLeft size={20} /></button>
+      <button onClick={isHost ? handleDelete : handleLeave}>
+        <RoomOutIcon className="w-5 h-5" />
+      </button>
+
       <div className="font-medium text-[0.875rem] flex items-center gap-2">
         <span className="text-[0.5rem] ml-5" style={{ color: statusColor }}>●</span>
         <span className="text-gray-600 font-medium">
           {statusText} ({current}/{total})
         </span>
       </div>
-      <button className="text-sm text-gray-500" onClick={isHost ? handleDelete : handleLeave}>
-        {isHost ? '삭제하기' : '나가기'}
-      </button>
+
+      <button className="text-sm text-gray-500">위치보기</button>
     </div>
   );
 };

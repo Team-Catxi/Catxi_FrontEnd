@@ -27,10 +27,10 @@ const DefaultBox = ({ chatRoom, myEmail, onRequestReady }: Props) => {
   return (
     <div className="w-full bg-[#F5F5F5] rounded-xl px-[1.625rem] py-[1rem] flex justify-between items-center mb-5">
       <div>
-        <p className="text-[1.25rem] font-medium text-[#7424F5]">
+        <p className="text-[1.25rem] font-semibold text-[#7424F5]">
           {`${displayStart} → ${displayEnd}`}
         </p>
-        <div className="flex items-center gap-1 text-[0.875rem] text-[#424242] mt-1">
+        <div className="flex items-center gap-1 text-[0.875rem] font-medium text-[#424242] mt-1">
           <Timer className="w-3 h-3 text-[#424242]" />
           <span>{departText}</span>
         </div>

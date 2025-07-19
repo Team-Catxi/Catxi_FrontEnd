@@ -1,7 +1,7 @@
 interface LeaveRoomModalProps {
   onConfirm: () => void;
   onCancel: () => void;
-  type?: 'leave' | 'delete'; 
+  type?: 'leave' | 'delete';
 }
 
 const LeaveRoomModal = ({ onConfirm, onCancel, type = 'leave' }: LeaveRoomModalProps) => {
@@ -14,7 +14,7 @@ const LeaveRoomModal = ({ onConfirm, onCancel, type = 'leave' }: LeaveRoomModalP
       </h2>
 
       {!isDelete && (
-        <p className="text-center text-[1.125rem] text-[#9E9E9E] py-2 mt-1 ">
+        <p className="text-center text-[1.125rem] text-[#9E9E9E] py-2 mt-1">
           단시간 내 여러번 나갈 경우, <br />
           사용에 제한이 있을 수 있습니다.
         </p>
@@ -31,7 +31,7 @@ const LeaveRoomModal = ({ onConfirm, onCancel, type = 'leave' }: LeaveRoomModalP
           onClick={onConfirm}
           className="flex-1 bg-[#424242] text-[#FEFEFE] py-[0.75rem] rounded-lg"
         >
-          삭제하기
+          {isDelete ? '삭제하기' : '나가기'}
         </button>
       </div>
     </div>

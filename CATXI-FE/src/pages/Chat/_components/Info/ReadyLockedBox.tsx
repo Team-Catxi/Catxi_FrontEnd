@@ -55,7 +55,7 @@ const ReadyLockedBox = ({ departAt }: Props) => {
   }, [departDate, remainingSec]);
 
   return (
-    <div className="w-full bg-[#7424F5] px-[1.625rem] py-[1rem] flex justify-between items-center mb-5">
+    <div className="w-full bg-[#7424F5] px-[1.625rem] py-[0.875rem] flex justify-between items-center mb-5">
       <div>
         <p className="text-[1.25rem] font-semibold text-[#FAFAFA]">{formattedTime}</p>
         <p className="text-[0.875rem] font-medium text-[#E6D8FF]">위 시간까지 장소로 모여주세요!</p>
