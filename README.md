@@ -28,3 +28,47 @@ React는 사용자 인터페이스를 구축하기 위한 JavaScript 라이브�
 
 It allows developers to build UI components declaratively, manage state efficiently, and create dynamic, responsive applications.
 선언형 방식으로 UI를 구성하고, 상태 관리를 통해 동적이고 반응형인 앱을 쉽게 개발할 수 있습니다.
+
+### 라이브러리
+🔧 프로젝트 세팅
+pnpm
+vite
+
+🎨 스타일
+tailwindcss
+@tailwindcss/vite
+
+⚛️ React 관련
+react
+react-router-dom
+
+📡 API 통신
+axios
+
+📋 폼
+react-hook-form
+@hookform/resolvers
+zod
+
+📦 상태 관리
+@tanstack/react-query
+@tanstack/react-query-devtools
+
+👀 옵저버
+react-intersection-observer
+
+🧩 유틸
+clsx
+
+🖼️ SVG
+vite-plugin-svgr
+
+📱 PWA
+vite-plugin-pwa
+
+💬 WebSocket
+sockjs-client
+webstomp-client
+
+📆 모바일 피커
+react-mobile-picker-scroll
