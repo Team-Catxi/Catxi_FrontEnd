@@ -21,8 +21,10 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: CATXI-FE/pnpm-lock.yaml 
 
-      - name: Enable corepack (pnpm)
-        run: corepack enable
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
 
       - name: Check pnpm version
         run: pnpm --version
