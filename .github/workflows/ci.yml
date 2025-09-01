@@ -1,29 +1,30 @@
-name: Deploy to Firebase Hosting on PR
-on: pull_request
-permissions:
-  checks: write
-  contents: read
-  pull-requests: write
+name: pnpm Workflow
+
+on:
+  push:
+    branches: [dev]
 
 jobs:
-  build_and_preview:
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        node-version: [22]
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-          cache-dependency-path: CATXI-FE/pnpm-lock.yaml
+          cache-dependency-path: CATXI-FE/pnpm-lock.yaml 
 
-      - name: Enable corepack
-        run: corepack enable
-
-      - name: Check pnpm version
-        run: pnpm --version
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
 
       - name: Install dependencies
         working-directory: CATXI-FE
@@ -32,9 +33,3 @@ jobs:
       - name: Build
         working-directory: CATXI-FE
         run: pnpm run build
-
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CATXI_UNIVERSITY_TAXI_B0936 }}
-          projectId: catxi-university-taxi-b0936
