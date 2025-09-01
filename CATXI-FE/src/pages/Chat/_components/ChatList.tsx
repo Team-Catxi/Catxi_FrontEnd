@@ -1,15 +1,18 @@
 import { useEffect, useRef, useMemo } from "react";
 import ChatItem from "./ChatItem";
-import JoinMessage from "./JoinMessage";
+import UserMessageItem from "./UserMessage";
 import { useOutletContext, useParams } from "react-router-dom";
 import type { ChatMessage } from "../../../types/chat/chat";
+import type { SystemMessage } from "../../../types/systemMessage/systemMessage";
+
+type CombinedMessage = ChatMessage | SystemMessage;
 
 interface ChatContext {
   nicknameMap: Record<string, string>;
 }
 
 interface Props {
-  messages: ChatMessage[];
+  messages: CombinedMessage[];
 }
 
 const ChatList = ({ messages }: Props) => {
@@ -20,50 +23,42 @@ const ChatList = ({ messages }: Props) => {
   useEffect(() => {
     if (!listRef.current || !roomId) return;
 
-    const hasVisited = sessionStorage.getItem(`visited-${roomId}`);
+    const el = listRef.current;
+    const isAtBottom =
+      el.scrollTop + el.clientHeight >= el.scrollHeight - 10;
 
-    const scrollToBottom = () => {
-      listRef.current!.scrollTo({
-        top: listRef.current!.scrollHeight,
-        behavior: hasVisited ? "smooth" : "auto",
+    if (isAtBottom) {
+      requestAnimationFrame(() => {
+        el.scrollTo({
+          top: el.scrollHeight,
+          behavior: "smooth",
+        });
       });
-    };
-
-    requestAnimationFrame(() => {
-      scrollToBottom();
-      sessionStorage.setItem(`visited-${roomId}`, "true");
-    });
+    }
   }, [messages, roomId]);
 
   const renderedMessages = useMemo(() => {
-    const seenEmails = new Set<string>();
-
-    return messages.flatMap((msg, idx) => {
-      const isSystemJoinMessage =
-        msg.message.includes("참여") && msg.email && !msg.isMine;
-
-      const nickname = nicknameMap[msg.email] || msg.email;
-
-      const elements = [];
-
-      if (isSystemJoinMessage && !seenEmails.has(msg.email)) {
-        seenEmails.add(msg.email);
-        elements.push(
-          <JoinMessage key={`join-${msg.email}-${idx}`} name={nickname} />
+    return messages.map((msg, idx) => {
+      if ("type" in msg && msg.type === "SYSTEM") {
+        return (
+          <UserMessageItem
+            key={`system-${idx}`}
+            content={msg.content}
+          />
         );
       }
 
-      elements.push(
+      const chatMsg = msg as ChatMessage;
+
+      return (
         <ChatItem
-          key={`chat-${idx}`}
-          message={msg.message}
-          isMe={msg.isMine ?? false}
-          email={msg.email}
-          sentAt={msg.sentAt}
+          key={`chat-${chatMsg.messageId ?? idx}`}
+          message={chatMsg.message}
+          isMe={chatMsg.isMine ?? false}
+          email={chatMsg.email}
+          sentAt={chatMsg.sentAt}
         />
       );
-
-      return elements;
     });
   }, [messages, nicknameMap]);
 

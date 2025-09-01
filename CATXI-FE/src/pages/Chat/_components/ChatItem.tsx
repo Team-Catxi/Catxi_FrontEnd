@@ -1,8 +1,9 @@
-import { useModal } from "../../../contexts/ModalContext";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { useParams, useOutletContext } from "react-router-dom";
 import ChatMemberModal from "../../../components/Modal/UserModal";
-import { useReportUser } from "../../../hooks/mutation/chat/useReportUser";
-import { useKickUser } from "../../../hooks/mutation/chat/useKickUser.ts";
+import ChatBubble from "./ChatItem/ChatBubble";
+import { useChatActions } from "../../../hooks/chatAction/useChatActions";
+import { formatTimestamp } from "../../../utils/chat/format";
+import { getDisplayName } from "../../../utils/chat/displayName";
 
 interface ChatContext {
   nicknameMap: Record<string, string>;
@@ -18,71 +19,21 @@ interface Props {
   sentAt: string;
 }
 
-const maskName = (identifier: string | null | undefined) => {
-  if (!identifier) return "";
-  const isEmail = identifier.includes("@");
-  const base = isEmail ? identifier.split("@")[0] : identifier;
-  if (base.length === 1) return base;
-  if (base.length === 2) return `${base[0]}*`;
-  return `${base[0]}*${base[2]}`;
-};
-
-const formatTimestamp = (sentAt: string) => {
-  const utc = new Date(sentAt);
-  const kst = new Date(utc.getTime());
-  return kst.toLocaleTimeString("ko-KR", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-};
-
 const ChatItem = ({ message, isMe, email, sentAt }: Props) => {
-  const { openModal, closeModal } = useModal();
   const { nicknameMap, hostEmail, myEmail } = useOutletContext<ChatContext>();
   const { roomId } = useParams();
-  const { mutate: reportUser } = useReportUser();
-  const { mutate: kickUser } = useKickUser();
-  const navigate = useNavigate();
 
   const isMyself = email === myEmail;
   const isHost = myEmail === hostEmail;
   const isTargetHost = email === hostEmail;
 
-  const nickname = nicknameMap[email];
-  const masked = maskName(email);
-  const displayName = nickname ? nickname : masked;
+  const displayName = getDisplayName(email, nicknameMap);
 
-  const handleReport = (reason: string) => {
-    if (!roomId) return;
-    reportUser({
-      roomId: Number(roomId),
-      targetUserEmail: email,
-      reason,
-    });
-  };
-
-  const handleKick = () => {
-    if (!roomId) return;
-    kickUser(
-      {
-        roomId: Number(roomId),
-        targetEmail: email,
-      },
-      {
-        onSuccess: () => {
-          closeModal();
-          
-          if (email === myEmail) {
-          navigate("/home");
-        }
-        },
-        onError: () => {
-          alert("강퇴에 실패했습니다.");
-        },
-      }
-    );
-  };
+  const { handleReport, handleKick, openModal } = useChatActions(
+    Number(roomId),
+    email,
+    myEmail,
+  );
 
   const handleNameClick = () => {
     if (isMyself) return;
@@ -90,23 +41,20 @@ const ChatItem = ({ message, isMe, email, sentAt }: Props) => {
     openModal(
       <ChatMemberModal
         name={displayName}
-        nickname={nickname}
+        nickname={nicknameMap[email]}
         isHost={isHost}
         isMyself={isMyself}
         roomId={parseInt(roomId ?? "0")}
         targetUserId={email}
-        onReport={(reason) => handleReport(reason)}
-        onKick={isHost && !isTargetHost ? () => handleKick() : undefined}
+        onReport={handleReport}
+        onKick={isHost && !isTargetHost ? handleKick : undefined}
       />
     );
   };
 
   return (
     <div className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
-      <div 
-        className="flex items-center gap-[0.5rem] mb-1"
-        onClick={handleNameClick}
-      >
+      <div className="flex items-center gap-[0.5rem] mb-1" onClick={handleNameClick}>
         <p className="text-xs text-gray-600 cursor-pointer hover:underline">
           {displayName}
         </p>
@@ -116,6 +64,7 @@ const ChatItem = ({ message, isMe, email, sentAt }: Props) => {
           </span>
         )}
       </div>
+
       <div
         className={`inline-flex items-end gap-[0.625rem] ${
           isMe ? "justify-end" : "justify-start"
@@ -126,15 +75,11 @@ const ChatItem = ({ message, isMe, email, sentAt }: Props) => {
             <span className="text-[10px] text-gray-400 mb-0.5">
               {formatTimestamp(sentAt)}
             </span>
-            <div className="inline-block text-sm px-3 py-2 bg-[#8C46F6] text-white rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl">
-              {message}
-            </div>
+            <ChatBubble message={message} isMe />
           </>
         ) : (
           <>
-            <div className="inline-block text-sm px-3 py-2 bg-gray-200 text-black rounded-tr-2xl rounded-br-2xl rounded-bl-2xl">
-              {message}
-            </div>
+            <ChatBubble message={message} isMe={false} />
             <span className="text-[10px] text-gray-400 mb-0.5">
               {formatTimestamp(sentAt)}
             </span>
