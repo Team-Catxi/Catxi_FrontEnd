@@ -1,5 +1,3 @@
-// src/mocks/chat.mock.ts
-
 import type {
   ChatMessagesResponse,
   ChatRoomResponse,
@@ -7,7 +5,6 @@ import type {
 
 import type { ChatRoomDetailResponse } from '../types/chat/chatRoomDetail';
 
-// ✅ 1. ChatMessagesResponse
 export const mockChatMessages: ChatMessagesResponse = {
   success: true,
   code: 'CHAT_MESSAGES_MOCK_SUCCESS',
@@ -34,7 +31,6 @@ export const mockChatMessages: ChatMessagesResponse = {
   ],
 };
 
-// ✅ 2. ChatRoomResponse
 export const mockChatRooms: ChatRoomResponse = {
   success: true,
   code: 'CHAT_ROOMS_MOCK_SUCCESS',
@@ -78,7 +74,6 @@ export const mockChatRooms: ChatRoomResponse = {
   },
 };
 
-// ✅ 3. ChatRoomDetailResponse
 export const mockChatRoomDetail: ChatRoomDetailResponse = {
   success: true,
   code: 'CHAT_ROOM_DETAIL_MOCK_SUCCESS',
