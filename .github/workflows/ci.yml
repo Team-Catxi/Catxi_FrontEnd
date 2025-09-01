@@ -9,10 +9,15 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        node-version: [20, 22]
+        node-version: [22]
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -21,18 +26,6 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: CATXI-FE/pnpm-lock.yaml 
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10
-
-      - name: Check pnpm version
-        run: pnpm --version
-
       - name: Install dependencies
         working-directory: CATXI-FE
         run: pnpm install
-
-      - name: Build
-        working-directory: CATXI-FE
-        run: pnpm run build
