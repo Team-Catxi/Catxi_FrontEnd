@@ -1,9 +1,9 @@
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import ChatInput from '../pages/Chat/_components/ChatInput';
-import { useChatConnection } from '../hooks/chatConnect/useChatConnection';
 import LogoText from '../assets/icons/logoText.svg?react';
 import { useNavigationBlocker } from '../hooks/navigation/useNavigationBlocker';
+import { useChatConnection } from '../hooks/chatConnect/useChatConnection';
 
 const ChatLayout = () => {
   const navigate = useNavigate();

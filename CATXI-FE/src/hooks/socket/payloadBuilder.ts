@@ -6,5 +6,5 @@ export const buildChatPayload = (
   message,
   email,
   roomId,
-  sentAt: new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString(), // KST 기준
+  sentAt: new Date(Date.now() - 9 * 60 * 60 * 1000).toISOString(), 
 });

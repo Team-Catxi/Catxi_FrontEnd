@@ -42,7 +42,7 @@ const HomePage = () => {
           onSelectSort={setSort}
         />
 
-        <div className="flex-1 overflow-y-scroll mb-[6rem]">
+        <div className="flex-1 overflow-y-auto mb-[6rem] custom-scrollbar">
           <ChatCardList
             direction={direction}
             station={selectedLocations[direction] || ""}

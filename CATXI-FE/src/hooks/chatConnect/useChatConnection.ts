@@ -14,17 +14,22 @@ import { parseChatMessage, parseReadyMessage } from '../../utils/chat/parseSocke
 export function useChatConnection(roomId: number) {
   const email = useUserEmail();
 
-  const { data: chatRoomDetail, isLoading, isError, refetch: refetchChatRoomDetail } =
-    useChatRoomDetail(roomId);
+  const {
+    data: chatRoomDetail,
+    isLoading,
+    isError,
+    refetch: refetchChatRoomDetail,
+  } = useChatRoomDetail(roomId);
+
   const { data: chatHistory } = useChatMessages(roomId);
 
   const nicknameMap = useMemo(
     () =>
       buildNicknameMap(
         chatRoomDetail?.data?.participantEmails,
-        chatRoomDetail?.data?.participantNicknames
+        chatRoomDetail?.data?.participantNicknames,
       ),
-    [chatRoomDetail]
+    [chatRoomDetail],
   );
 
   const hostEmail = chatRoomDetail?.data?.hostEmail ?? '';
@@ -33,9 +38,9 @@ export function useChatConnection(roomId: number) {
       getHostNickname(
         hostEmail,
         chatRoomDetail?.data?.participantEmails,
-        chatRoomDetail?.data?.participantNicknames
+        chatRoomDetail?.data?.participantNicknames,
       ),
-    [chatRoomDetail, hostEmail]
+    [chatRoomDetail, hostEmail],
   );
 
   const { messages, setMessages, handleMessage } = useChatMessagesHandler(email ?? '');
@@ -45,7 +50,7 @@ export function useChatConnection(roomId: number) {
     email ?? '',
     hostEmail,
     nicknameMap,
-    chatRoomDetail?.data?.currentSize ?? 1
+    chatRoomDetail?.data?.currentSize ?? 1,
   );
 
   useEffect(() => {
@@ -58,14 +63,14 @@ export function useChatConnection(roomId: number) {
     roomId,
     Storage.getAccessToken()!,
     (raw) => handleMessage(parseChatMessage(raw, email ?? '', nicknameMap)),
-    (raw) => handleReadyMessage(parseReadyMessage(raw))
+    (raw) => handleReadyMessage(parseReadyMessage(raw)),
   );
 
   useEffect(() => {
     if (!roomId || !email) return;
     connect();
     return () => disconnect();
-  }, [roomId, email, connect, disconnect]);
+  }, [roomId, email]);
 
   const sendChatMessage = (message: string) =>
     sendMessage(buildChatPayload(message, email ?? '', roomId));
