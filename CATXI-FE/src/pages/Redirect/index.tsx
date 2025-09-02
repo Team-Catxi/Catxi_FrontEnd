@@ -13,7 +13,7 @@ const Redirection = () => {
     const fetchData = async () => {
       try {
         const { data, headers } = await axiosInstance.get<LoginResponse>(
-          `/auth/login/kakao?code=${code}`
+          `/api/auth/login/kakao?code=${code}`
         );
         const accessToken = headers["access"];
         const isNewUser =
