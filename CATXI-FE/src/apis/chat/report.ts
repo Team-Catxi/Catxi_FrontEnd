@@ -5,7 +5,7 @@ export const reportUser = (
   targetUserId: string,
   reason: string
 ) => {
-  return axiosInstance.post(`/rooms/${roomId}/report/${targetUserId}`, {
+  return axiosInstance.post(`/api/rooms/${roomId}/report/${targetUserId}`, {
     reason,
   });
 };
