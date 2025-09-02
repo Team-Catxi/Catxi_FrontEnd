@@ -91,7 +91,7 @@ const ChatCardList = ({
 
   if (!futureRooms.length) {
     return (
-      <div className="flex justify-center items-center p-4 h-[60vh]">
+      <div className="flex justify-center items-center p-4 h-[60vh] custom-scrollbar">
         <div className="flex flex-col justify-center items-center gap-2 text-[#9E9E9E]">
           <NoContent />
           <p>아직 생성된 채팅방이 없어요</p>
@@ -102,7 +102,7 @@ const ChatCardList = ({
   }
 
   return (
-    <div className="mt-4 flex flex-col gap-4">
+    <div className="mt-4 flex flex-col gap-4 custom-scrollbar">
       {chatRooms.map((room: ChatRoomItem) => (
         <ChatCard key={room.roomId} data={room} />
       ))}

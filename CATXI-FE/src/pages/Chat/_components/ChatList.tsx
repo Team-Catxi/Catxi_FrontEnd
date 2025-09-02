@@ -1,6 +1,6 @@
 import { useEffect, useRef, useMemo } from "react";
 import ChatItem from "./ChatItem";
-import UserMessageItem from "./UserMessage";
+import UserSystemMessageItem from "./UserSystemMessage";
 import { useOutletContext, useParams } from "react-router-dom";
 import type { ChatMessage } from "../../../types/chat/chat";
 import type { SystemMessage } from "../../../types/systemMessage/systemMessage";
@@ -38,21 +38,22 @@ const ChatList = ({ messages }: Props) => {
   }, [messages, roomId]);
 
   const renderedMessages = useMemo(() => {
-    return messages.map((msg, idx) => {
-      if ("type" in msg && msg.type === "SYSTEM") {
+    return messages.map((msg) => {
+      const isSystem = (msg as any).senderEmail === "[SYSTEM]";
+
+      if (isSystem) {
         return (
-          <UserMessageItem
-            key={`system-${idx}`}
-            content={msg.content}
+          <UserSystemMessageItem
+            key={`system-${(msg as any).messageId}`} 
+            content={(msg as any).content}
           />
         );
       }
 
       const chatMsg = msg as ChatMessage;
-
       return (
         <ChatItem
-          key={`chat-${chatMsg.messageId ?? idx}`}
+          key={`chat-${chatMsg.messageId}`}      
           message={chatMsg.message}
           isMe={chatMsg.isMine ?? false}
           email={chatMsg.email}

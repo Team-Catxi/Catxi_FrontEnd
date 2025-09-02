@@ -1,4 +1,3 @@
-// utils/chat/format.ts
 export const maskName = (identifier: string | null | undefined) => {
   if (!identifier) return "";
   const isEmail = identifier.includes("@");
@@ -9,8 +8,11 @@ export const maskName = (identifier: string | null | undefined) => {
 };
 
 export const formatTimestamp = (sentAt: string) => {
-  const utc = new Date(sentAt);
-  return utc.toLocaleTimeString("ko-KR", {
+  const date = new Date(sentAt);
+
+  date.setHours(date.getHours() + 9);
+
+  return date.toLocaleTimeString("ko-KR", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,

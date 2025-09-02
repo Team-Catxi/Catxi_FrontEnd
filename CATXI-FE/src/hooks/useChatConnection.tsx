@@ -14,73 +14,68 @@ import type { ReadyMessage } from '../types/chat/readyMessage';
 
 export function useChatConnection(roomId: number) {
   const email = useUserEmail();
-
-  // ===== State =====
   const [acceptCount, setAcceptCount] = useState(0);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [readyMessages, setReadyMessages] = useState<ReadyMessage[]>([]);
 
-  // ===== Query =====
-  const { data: chatRoomDetail, isLoading, isError, refetch: refetchChatRoomDetail } =
-    useChatRoomDetail(roomId);
+  const { data: chatRoomDetail, isLoading, isError, refetch: refetchChatRoomDetail } = useChatRoomDetail(roomId);
   const { data: chatHistory } = useChatMessages(roomId);
 
-  // ===== Hooks =====
   const { openModal } = useModal();
   const { mutate: acceptReady } = useReadyAccept();
   const { mutate: rejectReady } = useReadyReject();
 
-  // ===== Derived Data =====
-  const nicknameMap = useMemo(
-    () =>
-      buildNicknameMap(
-        chatRoomDetail?.data?.participantEmails,
-        chatRoomDetail?.data?.participantNicknames
-      ),
-    [chatRoomDetail]
-  );
+  const nicknameMap = useMemo(() => {
+    return buildNicknameMap(
+      chatRoomDetail?.data?.participantEmails,
+      chatRoomDetail?.data?.participantNicknames
+    );
+  }, [chatRoomDetail]);
 
   const hostEmail = chatRoomDetail?.data?.hostEmail ?? '';
-  const hostNickname = useMemo(
-    () =>
-      getHostNickname(
-        hostEmail,
-        chatRoomDetail?.data?.participantEmails,
-        chatRoomDetail?.data?.participantNicknames
-      ),
-    [chatRoomDetail, hostEmail]
-  );
+  const hostNickname = useMemo(() => {
+    return getHostNickname(
+      hostEmail,
+      chatRoomDetail?.data?.participantEmails,
+      chatRoomDetail?.data?.participantNicknames
+    );
+  }, [chatRoomDetail, hostEmail]);
 
-  // ===== Accept / Reject Handlers =====
-  const handleAccept = useCallback(() => {
+  const handleAccept = () => {
     acceptReady(roomId);
     setAcceptCount((prev) => prev + 1);
-  }, [acceptReady, roomId]);
+  };
+  const handleReject = () => {
+    rejectReady(roomId); 
+  };
 
-  const handleReject = useCallback(() => {
-    rejectReady(roomId);
-  }, [rejectReady, roomId]);
-
-  // ===== History 초기 세팅 =====
   useEffect(() => {
     if (chatHistory?.data && email) {
       setMessages(mapChatHistoryToMessages(chatHistory.data, email));
     }
   }, [chatHistory, email]);
 
-  // ===== Message Handler =====
-  const handleMessage = useCallback((msg: ChatMessage, options?: { isHistory?: boolean }) => {
-    setMessages((prev) => {
-      if (options?.isHistory && msg.messageId) {
-        const exists = prev.some((m) => m.messageId === msg.messageId);
-        return exists ? prev : [...prev, msg];
-      }
-      return [...prev, msg];
-    });
-  }, []);
+  const handleMessage = useCallback(
+    (msg: ChatMessage, options?: { isHistory?: boolean }) => {
+      setMessages((prev) => {
+        if (options?.isHistory) {
+          const exists = prev.some(
+            (m) =>
+              m.sentAt === msg.sentAt &&
+              m.message === msg.message &&
+              m.email === msg.email
+          );
+          return exists ? prev : [...prev, msg];
+        }
+        return [...prev, msg];
+      });
+    },
+    []
+  );
 
-  // ===== ReadyMessage Handler =====
   const handleReadyMessage = useCallback(
     (msg: ReadyMessage) => {
+      console.log('[useChatConnection Ready 수신]', msg);
       if (!email || !hostEmail) return;
 
       const senderName = nicknameMap[msg.senderEmail] || msg.senderEmail;
@@ -93,18 +88,14 @@ export function useChatConnection(roomId: number) {
           onAccept={handleAccept}
           onReject={handleReject}
           isHost={email === hostEmail}
-        />,
-        { dismissible: false }
+        />
       );
 
-      if (msg.type === 'accept') {
-        setAcceptCount((prev) => prev + 1);
-      }
+      setReadyMessages((prev) => [...prev, msg]);
     },
-    [nicknameMap, openModal, chatRoomDetail?.data?.currentSize, acceptCount, email, hostEmail, handleAccept, handleReject]
+    [nicknameMap, openModal, chatRoomDetail?.data.currentSize, acceptReady, rejectReady, roomId, email, hostEmail]
   );
 
-  // ===== WebSocket 연결 =====
   const { connect, disconnect, sendMessage, isConnected } = useChatSocket(
     roomId,
     Storage.getAccessToken()!,
@@ -114,25 +105,27 @@ export function useChatConnection(roomId: number) {
     nicknameMap
   );
 
+  const isReadyToConnect = email && hostEmail && Object.keys(nicknameMap).length > 0;
+
   useEffect(() => {
-    if (!roomId || !email) return;
+    if (!roomId || !isReadyToConnect) return;
+
     connect();
     return () => disconnect();
-  }, [roomId, email, connect, disconnect]);
+  }, [roomId, isReadyToConnect, connect, disconnect]);
 
-  // ===== Return =====
   return {
     messages,
     myEmail: email ?? '',
     sendMessage,
+    readyMessages,
     nicknameMap,
     hostEmail,
     hostNickname,
     chatRoomDetail: chatRoomDetail?.data,
     refetchChatRoomDetail,
-    acceptCount,
     isLoading,
     isError,
     isConnected,
   };
-}
+};
