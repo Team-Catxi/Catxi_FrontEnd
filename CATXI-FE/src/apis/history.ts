@@ -7,7 +7,7 @@ export const getHistoryList = async ({
   sort,
 }: GetHistoryParams): Promise<GetHistoryResponse> => {
   const { data } = await axiosInstance.get<GetHistoryResponse>(
-    "/members/history/all",
+    "/api/members/history/all",
     {
       params: {
         page,

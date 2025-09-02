@@ -6,7 +6,7 @@ export const SignIn = async ({
   nickname,
   StudentNo,
 }: signInParams): Promise<AxiosResponse> => {
-  const { data } = await axiosInstance.patch("/auth/signUp/catxi", {
+  const { data } = await axiosInstance.patch("/api/auth/signUp/catxi", {
     nickname,
     StudentNo,
   });
