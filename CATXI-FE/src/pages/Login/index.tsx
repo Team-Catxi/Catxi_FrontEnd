@@ -1,6 +1,6 @@
 // import { useNavigate } from "react-router-dom";
 import Kakao from "../../assets/icons/kakao.svg?react";
-import Logo from "../../../public/logo.svg?react";
+import Logo from "../../assets/icons/CatxiLogo.svg?react";
 import LogoText from "../../assets/icons/logoText.svg?react";
 export const Login = () => {
   const handleKakaoLogin = () => {

@@ -5,21 +5,26 @@ import { useLeaveChatRoom, useDeleteChatRoom } from '../../../hooks/mutation/cha
 import { useModal } from '../../../contexts/ModalContext';
 import LeaveRoomModal from '../../../components/Modal/LeaveRoomModal';
 import RoomOutIcon from '../../../assets/icons/RoomOut.svg?react';
+import LocationBlockedModal from './Map/LocationBlockedModal';
+import { useState } from 'react';
 
 interface ChatContext {
   hostEmail: string;
   hostNickname: string;
   myEmail: string;
   chatRoom?: ChatRoomDetail;
+  setShowMap: (show: boolean) => void; 
 }
 
 const TopStatusBar = () => {
-  const { myEmail, chatRoom } = useOutletContext<ChatContext>();
+  const { myEmail, chatRoom, setShowMap } = useOutletContext<ChatContext>();
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { mutate: leaveRoom } = useLeaveChatRoom();
   const { mutate: deleteRoom } = useDeleteChatRoom();
   const { openModal, closeModal } = useModal();
+
+  const [showBlockedModal, setShowBlockedModal] = useState(false);
 
   const current = chatRoom?.currentSize ?? 0;
   const total = (chatRoom?.recruitSize ?? 0) + 1;
@@ -27,6 +32,14 @@ const TopStatusBar = () => {
   const statusText = status ? statusTextMap[status] : '';
   const statusColor = status ? statusColorMap[status] : '#D1D5DB';
   const isHost = myEmail === chatRoom?.hostEmail;
+
+  const handleViewLocation = () => {
+    if (status === 'READY_LOCKED') {
+      setShowMap(true);
+    } else {
+      setShowBlockedModal(true);
+    }
+  };
 
   const handleLeave = () => {
     if (!roomId) return;
@@ -84,7 +97,20 @@ const TopStatusBar = () => {
         </span>
       </div>
 
-      <button className="text-sm text-gray-500">위치보기</button>
+      <button
+        className="text-sm"
+        style={{
+          color: status === 'READY_LOCKED' ? '#000000' : '#9E9E9E',
+          cursor: 'pointer', 
+        }}
+        onClick={handleViewLocation}
+      >
+        위치보기
+      </button>
+
+      {showBlockedModal && (
+        <LocationBlockedModal onConfirm={() => setShowBlockedModal(false)} />
+      )}
     </div>
   );
 };

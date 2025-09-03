@@ -9,4 +9,5 @@ export const stationDisplayMap: Record<string, string> = {
   YEOKGOK_ST: '역곡역',
   GURO_ST: '구로역',
   SINDORIM_ST: '신도림역',
+  STUDENT_CENTER: '학생회관',
 };
