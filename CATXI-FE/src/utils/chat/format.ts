@@ -10,8 +10,6 @@ export const maskName = (identifier: string | null | undefined) => {
 export const formatTimestamp = (sentAt: string) => {
   const date = new Date(sentAt);
 
-  date.setHours(date.getHours() + 9);
-
   return date.toLocaleTimeString("ko-KR", {
     hour: "2-digit",
     minute: "2-digit",
