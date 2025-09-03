@@ -22,30 +22,23 @@ const ChatList = ({ messages }: Props) => {
 
   useEffect(() => {
     if (!listRef.current || !roomId) return;
-
     const el = listRef.current;
-    const isAtBottom =
-      el.scrollTop + el.clientHeight >= el.scrollHeight - 10;
-
-    if (isAtBottom) {
-      requestAnimationFrame(() => {
-        el.scrollTo({
-          top: el.scrollHeight,
-          behavior: "smooth",
-        });
+    requestAnimationFrame(() => {
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: "smooth",
       });
-    }
+    });
   }, [messages, roomId]);
 
   const renderedMessages = useMemo(() => {
     return messages.map((msg) => {
-      const isSystem = (msg as any).senderEmail === "[SYSTEM]";
-
-      if (isSystem) {
+      if ((msg as SystemMessage).type === "SYSTEM") {
+        const sysMsg = msg as SystemMessage;
         return (
           <UserSystemMessageItem
-            key={`system-${(msg as any).messageId}`} 
-            content={(msg as any).content}
+            key={`system-${sysMsg.timestamp}`}
+            content={sysMsg.content}
           />
         );
       }
@@ -53,7 +46,7 @@ const ChatList = ({ messages }: Props) => {
       const chatMsg = msg as ChatMessage;
       return (
         <ChatItem
-          key={`chat-${chatMsg.messageId}`}      
+          key={`chat-${chatMsg.messageId ?? chatMsg.sentAt}`}
           message={chatMsg.message}
           isMe={chatMsg.isMine ?? false}
           email={chatMsg.email}
