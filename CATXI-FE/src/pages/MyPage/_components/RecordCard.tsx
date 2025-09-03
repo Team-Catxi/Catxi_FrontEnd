@@ -9,7 +9,7 @@ const RecordCard = ({
   const isoString = new Date(matchedAt).toISOString();
   const date = new Date(isoString);
   const week = ["일", "월", "화", "수", "목", "금", "토"];
-  const krDate = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+  const krDate = new Date(date.getTime());
   const formatted = `${krDate.getFullYear()}.${String(
     krDate.getMonth() + 1
   ).padStart(2, "0")}.${String(krDate.getDate()).padStart(2, "0")} (${
