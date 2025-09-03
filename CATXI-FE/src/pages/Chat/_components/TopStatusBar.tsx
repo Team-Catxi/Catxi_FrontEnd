@@ -6,6 +6,7 @@ import { useModal } from '../../../contexts/ModalContext';
 import LeaveRoomModal from '../../../components/Modal/LeaveRoomModal';
 import RoomOutIcon from '../../../assets/icons/RoomOut.svg?react';
 import LocationBlockedModal from './Map/LocationBlockedModal';
+import { useState } from 'react';
 
 interface ChatContext {
   hostEmail: string;
@@ -23,6 +24,8 @@ const TopStatusBar = () => {
   const { mutate: deleteRoom } = useDeleteChatRoom();
   const { openModal, closeModal } = useModal();
 
+  const [showBlockedModal, setShowBlockedModal] = useState(false);
+
   const current = chatRoom?.currentSize ?? 0;
   const total = (chatRoom?.recruitSize ?? 0) + 1;
   const status = chatRoom?.roomStatus;
@@ -34,7 +37,7 @@ const TopStatusBar = () => {
     if (status === 'READY_LOCKED') {
       setShowMap(true);
     } else {
-      openModal(<LocationBlockedModal onConfirm={closeModal} />);
+      setShowBlockedModal(true);
     }
   };
 
@@ -104,6 +107,10 @@ const TopStatusBar = () => {
       >
         위치보기
       </button>
+
+      {showBlockedModal && (
+        <LocationBlockedModal onConfirm={() => setShowBlockedModal(false)} />
+      )}
     </div>
   );
 };
