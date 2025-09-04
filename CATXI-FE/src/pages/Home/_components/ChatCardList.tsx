@@ -2,6 +2,7 @@ import { useChatRooms } from "../../../hooks/query/useChatRooms";
 import ChatCard from "./ChatCard";
 import type { ChatRoomItem } from "../../../types/chat/chatData";
 import LogoText from "../../../assets/icons/logoText.svg?react";
+import Logo from "../../../assets/icons/CatxiLogo.svg?react";
 import NoContent from "../../../assets/icons/noContent.svg?react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -69,14 +70,15 @@ const ChatCardList = ({
 
   if (isError) {
     return (
-      <div className="flex justify-center items-center h-[60vh]">
+      <div className="flex justify-center items-center h-[70vh]">
         <div className="flex flex-col items-center gap-4 text-center">
+          <Logo />
           <LogoText className="w-[10rem] h-auto" />
           <button
             onClick={handleRetry}
             className="px-8 py-2 bg-[#8C46F6] text-white rounded-full shadow hover:bg-[#722de2] transition"
           >
-            retry
+            reStart
           </button>
         </div>
       </div>
