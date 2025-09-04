@@ -58,7 +58,9 @@ const TopStatusBar = () => {
           });
         }}
         onCancel={closeModal}
-      />
+      />,
+      
+      { dismissible: false }
     );
   };
 

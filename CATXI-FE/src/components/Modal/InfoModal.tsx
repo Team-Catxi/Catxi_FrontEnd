@@ -1,5 +1,5 @@
 const InfoModal = ({ message, onClose }: { message: string; onClose: () => void }) => (
-  <div className="z-500">
+  <div className="z-[1000]">
     <h2 className="text-lg font-bold">알림</h2>
     <p className="text-md mt-2">{message}</p>
     <div className="flex w-full mt-4">

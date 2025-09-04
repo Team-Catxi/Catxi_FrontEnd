@@ -88,7 +88,9 @@ export function useChatConnection(roomId: number) {
           onAccept={handleAccept}
           onReject={handleReject}
           isHost={email === hostEmail}
-        />
+        />,
+        
+        { dismissible: false }
       );
 
       setReadyMessages((prev) => [...prev, msg]);

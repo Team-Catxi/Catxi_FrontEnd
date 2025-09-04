@@ -49,31 +49,26 @@ const TimePicker = ({ onCancel }: PickerProp) => {
   const koreaNow = new Date(
     now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
   );
-  const currentHour = koreaNow.getHours();
-  const currentMinute = koreaNow.getMinutes();
-  const isDisabled = (name: string, value: string) => {
+
+  const isPastTime = () => {
     if (answers.isToday !== "today") return false;
 
-    const optionValue = Number(value);
+    const hour = Number(valueGroups.hour);
+    const minute = Number(valueGroups.minute);
 
-    if (name === "hour") {
-      return optionValue < currentHour;
-    }
-    if (name === "minute") {
-      const selectedHour = Number(valueGroups.hour);
-      if (selectedHour === currentHour) {
-        return optionValue < currentMinute;
-      }
-    }
-    return false;
+    const selected = new Date(koreaNow);
+    selected.setHours(hour, minute, 0, 0);
+
+    return selected.getTime() < koreaNow.getTime();
   };
 
   const handleChange = (name: string, value: string) => {
-    if (isDisabled(name, value)) return;
     setValueGroups((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleApply = () => {
+    if (isPastTime()) return; 
+
     const hour = Number(valueGroups.hour);
     const minute = valueGroups.minute;
 
@@ -106,20 +101,15 @@ const TimePicker = ({ onCancel }: PickerProp) => {
                 onChange={handleChange}
                 height={160}
                 itemHeight={44}
-                itemRender={(option, name) => {
-                  const disabled = isDisabled(name, option);
-                  return (
-                    <span
-                      style={{
-                        color: "#9E9E9E", 
-                        opacity: disabled ? 0.4 : 1, 
-                        pointerEvents: disabled ? "none" : "auto",
-                      }}
-                    >
-                      {option}
-                    </span>
-                  );
-                }}
+                itemRender={(option) => (
+                  <span
+                    style={{
+                      color: "#9E9E9E", 
+                    }}
+                  >
+                    {option}
+                  </span>
+                )}
               />
               <div
                 style={{
@@ -153,8 +143,13 @@ const TimePicker = ({ onCancel }: PickerProp) => {
               취소
             </button>
             <button
-              className="cursor-pointer px-10 py-2.5 bg-[#7424F5] rounded-xs text-[#FEFEFE] text-xs font-medium"
+              className={`cursor-pointer px-10 py-2.5 rounded-xs text-xs font-medium ${
+                isPastTime()
+                  ? "bg-[#E0E0E0] text-[#9E9E9E] cursor-not-allowed"
+                  : "bg-[#7424F5] text-[#FEFEFE]"
+              }`}
               onClick={handleApply}
+              disabled={isPastTime()}
             >
               적용
             </button>

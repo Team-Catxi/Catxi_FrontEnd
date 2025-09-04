@@ -6,7 +6,7 @@ interface LocationBlockedModalProps {
 
 const LocationBlockedModal = ({ onConfirm }: LocationBlockedModalProps) => {
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-500">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000]">
       <div className="bg-white rounded-[10px] p-5 flex flex-col items-center w-[min(100%,220px)]">
         <div className="mb-1">
           <NoLocationIcon />
