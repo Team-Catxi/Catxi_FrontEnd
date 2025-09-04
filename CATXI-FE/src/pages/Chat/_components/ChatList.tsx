@@ -15,6 +15,10 @@ interface Props {
   messages: CombinedMessage[];
 }
 
+const isSystemMessage = (msg: CombinedMessage): msg is SystemMessage => {
+  return (msg as any).type === "SYSTEM";
+};
+
 const ChatList = ({ messages }: Props) => {
   const listRef = useRef<HTMLDivElement>(null);
   const { nicknameMap } = useOutletContext<ChatContext>();
@@ -24,21 +28,17 @@ const ChatList = ({ messages }: Props) => {
     if (!listRef.current || !roomId) return;
     const el = listRef.current;
     requestAnimationFrame(() => {
-      el.scrollTo({
-        top: el.scrollHeight,
-        behavior: "smooth",
-      });
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
     });
   }, [messages, roomId]);
 
   const renderedMessages = useMemo(() => {
     return messages.map((msg) => {
-      if ((msg as SystemMessage).type === "SYSTEM") {
-        const sysMsg = msg as SystemMessage;
+      if (isSystemMessage(msg)) {
         return (
           <UserSystemMessageItem
-            key={`system-${sysMsg.timestamp}`}
-            content={sysMsg.content}
+            key={`system-${msg.timestamp}`}
+            content={msg.content}
           />
         );
       }

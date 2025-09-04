@@ -21,7 +21,7 @@ const LocationBlockedModal = ({ onConfirm }: LocationBlockedModalProps) => {
         <p className="text-[0.875rem] text-[#424242] mb-1 text-center">
           <span className="font-semibold">준비완료된 상태</span>에서만
         </p>
-        <p className="text-[0.875rem] text-[#424242] mb-5 text-center">
+        <p className="text-[0.875rem] text-[#424242] mb-3.5 text-center">
           멤버의 위치보기가 가능합니다.
         </p>
 
