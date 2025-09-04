@@ -59,7 +59,7 @@ const ReadyRequestModal = ({
   };
 
   const displayCurrent = current + 1; 
-  const displayTotal = total + 1;
+  const displayTotal = total;
 
   return (
     <div className="text-center items-center justify-center">
