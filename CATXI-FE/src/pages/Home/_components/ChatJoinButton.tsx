@@ -6,12 +6,12 @@ interface Props {
 }
 
 const ChatJoinButton = ({ status, onClick }: Props) => {
-  const isJoinable = status === undefined;
+  const isJoinable = status === "WAITING" || status === undefined;
   const isDisabled = !isJoinable;
 
   const displayText = isJoinable
     ? "채팅 참여하기"
-    : "다른 채팅 참여중"; 
+    : "다른 채팅 참여중";
 
   return (
     <button
