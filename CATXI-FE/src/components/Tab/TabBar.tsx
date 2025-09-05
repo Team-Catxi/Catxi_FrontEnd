@@ -24,7 +24,6 @@ const TabBar = () => {
   const { refetch, isFetching } = useMyChatRoomId({ enabled: false }); 
 
   const handleHomeClick = () => {
-    console.log("✅ 홈 클릭됨, 이동 시도:", currentPath);
     navigate('/home');
   };
 
