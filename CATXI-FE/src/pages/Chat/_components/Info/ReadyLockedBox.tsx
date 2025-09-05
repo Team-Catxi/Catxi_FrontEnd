@@ -1,23 +1,23 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+// import { useNavigate } from 'react-router-dom'; 
 
 interface Props {
   departAt: string;
 }
 
 const ReadyLockedBox = ({ departAt }: Props) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const departDate = useMemo(() => new Date(departAt), [departAt]);
 
   const [remainingSec, setRemainingSec] = useState(() =>
     Math.max(Math.floor((departDate.getTime() - Date.now()) / 1000), 0)
   );
 
-  useEffect(() => {
-    if (remainingSec === 0) {
-      navigate('/home');
-    }
-  }, [remainingSec, navigate]);
+  // useEffect(() => {
+  //   if (remainingSec === 0) {
+  //     navigate('/home');
+  //   }
+  // }, [remainingSec, navigate]);
 
   useEffect(() => {
     if (remainingSec > 60) return;

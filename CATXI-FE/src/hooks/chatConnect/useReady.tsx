@@ -9,7 +9,7 @@ export function useReady(
   myEmail: string,
   hostEmail: string,
   nicknameMap: Record<string, string>,
-  totalParticipants: number
+  totalParticipants: number,
 ) {
   const [acceptCount, setAcceptCount] = useState(0);
 
