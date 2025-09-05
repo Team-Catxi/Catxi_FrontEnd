@@ -2,7 +2,13 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import SockJS from "sockjs-client";
 import * as webstomp from "webstomp-client";
 import type { Client, Subscription } from "webstomp-client";
-import { chatTopic, readyTopic, publishTopic, systemMessageTopic, participantsTopic } from "./topics.ts";
+import {
+  chatTopic,
+  readyTopic,
+  publishTopic,
+  systemMessageTopic,
+  participantsTopic,
+} from "./topics.ts";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_API_URL;
 
@@ -84,6 +90,7 @@ export function useChatSocket(
           (msg) => participantsHandlerRef.current?.(JSON.parse(msg.body)),
           { Authorization: `Bearer ${jwtToken}` }
         );
+        //TODO: /topic/map/{roomId} 를 구독해주세요
       },
       (err) => {
         console.error("[WebSocket] 연결 실패:", err);

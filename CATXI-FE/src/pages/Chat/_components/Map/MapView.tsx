@@ -2,6 +2,7 @@ interface MapViewProps {
   onClose: () => void;
   roomId: number;
 }
+//TODO: 지도 컴포넌트로 교체 예정
 
 const MapView = ({ onClose, roomId }: MapViewProps) => {
   return (
