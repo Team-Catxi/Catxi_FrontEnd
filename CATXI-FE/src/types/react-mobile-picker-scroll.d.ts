@@ -15,6 +15,8 @@ declare module "react-mobile-picker-scroll" {
     itemStyle?: React.CSSProperties;
     indicatorStyle?: React.CSSProperties;
     maskStyle?: React.CSSProperties;
+
+    itemRender?: (option: string, name: string) => React.ReactNode;
   }
 
   const Picker: React.FC<PickerProps>;

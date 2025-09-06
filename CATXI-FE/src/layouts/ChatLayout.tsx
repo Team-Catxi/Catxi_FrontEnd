@@ -2,6 +2,7 @@ import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { useMemo, useState } from "react";
 import ChatInput from "../pages/Chat/_components/ChatInput";
 import LogoText from "../assets/icons/logoText.svg?react";
+import Logo from "../assets/icons/CatxiLogo.svg?react";
 import { useNavigationBlocker } from "../hooks/navigation/useNavigationBlocker";
 import { useChatConnection } from "../hooks/chatConnect/useChatConnection";
 import MapView from "../pages/Chat/_components/Map/MapView";
@@ -71,12 +72,13 @@ const ChatLayout = () => {
     return (
       <div className="flex justify-center items-center h-[90vh]">
         <div className="flex flex-col items-center gap-4 text-center">
+          <Logo />
           <LogoText className="w-[10rem] h-auto" />
           <button
             onClick={() => navigate("/")}
             className="px-8 py-2 bg-[#8C46F6] text-white rounded-full shadow hover:bg-[#722de2] transition"
           >
-            retry
+            reStart
           </button>
         </div>
       </div>

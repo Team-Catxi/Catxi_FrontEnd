@@ -20,8 +20,6 @@ const TabBar = () => {
   const showTabRoutes = ['/home', '/chat', '/myPage'];
   const isTabVisible = showTabRoutes.some((path) => currentPath.startsWith(path));
 
-  const isExact = (path: string) => currentPath === path;
-
   const token = Storage.getAccessToken();
   const { refetch, isFetching } = useMyChatRoomId({ enabled: false }); 
 
@@ -33,6 +31,10 @@ const TabBar = () => {
     if (!token) {
       setToastMsg('로그인이 필요합니다.');
       navigate('/');
+      return;
+    }
+
+    if (currentPath.startsWith('/chat/')) {
       return;
     }
 
@@ -78,11 +80,11 @@ const TabBar = () => {
           justify-center 
           items-center 
           shadow-[0_-4px_5px_0_rgba(0,0,0,0.05)] 
-          z-50
+          z-[999]
         "
       >
         <div className="cursor-pointer" onClick={handleHomeClick}>
-          {isExact('/home') ? <HomeButton /> : <HomeIcon />}
+          {currentPath === '/home' ? <HomeButton /> : <HomeIcon />}
         </div>
 
         <div className="mx-[5rem] cursor-pointer" onClick={handleChatClick}>
@@ -90,7 +92,7 @@ const TabBar = () => {
         </div>
 
         <div className="cursor-pointer" onClick={handleMyPageClick}>
-          {isExact('/myPage') ? <MyButton /> : <MyIcon />}
+          {currentPath === '/myPage' ? <MyButton /> : <MyIcon />}
         </div>
       </nav>
 

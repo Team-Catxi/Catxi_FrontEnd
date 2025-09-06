@@ -12,17 +12,25 @@ interface Props {
 const DefaultBox = ({ chatRoom, myEmail, onRequestReady }: Props) => {
   const isHost = myEmail === chatRoom.hostEmail;
 
+  const departDate = useMemo(() => new Date(chatRoom.departAt), [chatRoom]);
+  const now = new Date();
+
+  const isDisabled =
+    chatRoom.roomStatus === 'READY_LOCKED' || departDate <= now;
+
   const departText = useMemo(() => {
-    const departDate = new Date(chatRoom.departAt);
-    const now = new Date();
     const isTomorrow = departDate.getDate() !== now.getDate();
     const hour = departDate.getHours().toString().padStart(2, '0');
     const minute = departDate.getMinutes().toString().padStart(2, '0');
-    return `${isTomorrow ? '내일' : '오늘'} ${minute === '00' ? `${hour}시` : `${hour}시 ${minute}분`}에 출발해요`;
-  }, [chatRoom]);
+    return `${isTomorrow ? '내일' : '오늘'} ${
+      minute === '00' ? `${hour}시` : `${hour}시 ${minute}분`
+    }에 출발해요`;
+  }, [departDate, now]);
 
-  const displayStart = stationDisplayMap[chatRoom.startPoint] ?? chatRoom.startPoint;
-  const displayEnd = stationDisplayMap[chatRoom.endPoint] ?? chatRoom.endPoint;
+  const displayStart =
+    stationDisplayMap[chatRoom.startPoint] ?? chatRoom.startPoint;
+  const displayEnd =
+    stationDisplayMap[chatRoom.endPoint] ?? chatRoom.endPoint;
 
   return (
     <div className="w-full bg-[#F5F5F5] rounded-xl px-[1.625rem] py-[1rem] flex justify-between items-center mb-5">
@@ -38,11 +46,11 @@ const DefaultBox = ({ chatRoom, myEmail, onRequestReady }: Props) => {
 
       {isHost && (
         <button
-          disabled={chatRoom.roomStatus === 'READY_LOCKED'}
+          disabled={isDisabled}
           onClick={onRequestReady}
           className={`rounded-md px-[1.25rem] py-[0.625rem] text-sm font-semibold ${
-            chatRoom.roomStatus === 'READY_LOCKED'
-              ? 'bg-gray-300 text-gray-500'
+            isDisabled
+              ? 'bg-[#FEFEFE] text-[#9E9E9E]'
               : 'bg-[#424242] text-white'
           }`}
         >

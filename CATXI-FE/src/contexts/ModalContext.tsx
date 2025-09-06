@@ -38,7 +38,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
       {children}
       {isOpen && content && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-[1.656rem]"
+          className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 px-[1.656rem]"
           onClick={() => {
             if (dismissible) closeModal();
           }}
