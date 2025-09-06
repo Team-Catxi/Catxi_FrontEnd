@@ -1,3 +1,5 @@
+import MemberItem from "./_components/MemberItem";
+
 interface MapViewProps {
   onClose: () => void;
   roomId: number;
@@ -14,8 +16,9 @@ const MapView = ({ onClose, roomId }: MapViewProps) => {
         onClick={onClose}
         className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
       >
-        임시 닫기 버튼
+        임시 닫기
       </button>
+      <MemberItem roomId={roomId} />
     </div>
   );
 };

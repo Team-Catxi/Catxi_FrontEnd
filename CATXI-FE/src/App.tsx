@@ -15,6 +15,7 @@ import Redirection from "./pages/Redirect";
 import HomePage from "./pages/Home";
 import { AuthCheck } from "./utils/authCheck";
 import GlobalErrorPage from "./layouts/GlobalErrorPage";
+import TestPage from "./pages/TestPage";
 
 const publicRoutes = createBrowserRouter([
   {
@@ -48,6 +49,11 @@ const publicRoutes = createBrowserRouter([
       {
         path: "callback/kakao",
         element: <Redirection />,
+        handle: { isPublic: true },
+      },
+      {
+        path: "testPage",
+        element: <TestPage />,
         handle: { isPublic: true },
       },
     ],
