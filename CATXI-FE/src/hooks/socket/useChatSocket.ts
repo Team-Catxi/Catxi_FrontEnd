@@ -3,16 +3,16 @@ import { useNavigate } from "react-router-dom";
 import SockJS from "sockjs-client";
 import * as webstomp from "webstomp-client";
 import type { Client } from "webstomp-client";
-import { publishTopic } from "./topics.ts";
-import type { SubRefs } from "./subscriptions"; 
+import { publishTopic, mapPublish } from "./topics.ts"; 
+import type { SubRefs } from "./subscriptions";
 import {
   cleanupSubscriptions,
   setupSubscriptions,
-} from "./subscriptions"; 
+} from "./subscriptions";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_API_URL;
 
-export type ConnectionStatus = "idle" | "connecting" | "connected" | "error"; 
+export type ConnectionStatus = "idle" | "connecting" | "connected" | "error";
 
 export function useChatSocket(
   roomId: number,
@@ -20,7 +20,8 @@ export function useChatSocket(
   onChatMessage: (raw: any) => void,
   onReadyMessage?: (raw: any) => void,
   onSystemMessage?: (raw: any) => void,
-  onParticipantsMessage?: (raw: any) => void
+  onParticipantsMessage?: (raw: any) => void,
+  onMapMessage?: (raw: any) => void 
 ) {
   const stompClientRef = useRef<Client | null>(null);
   const subRefs = useRef<SubRefs>({
@@ -29,6 +30,7 @@ export function useChatSocket(
     system: null,
     participants: null,
     deleted: null,
+    map: null, 
   });
 
   const [status, setStatus] = useState<ConnectionStatus>("idle");
@@ -37,6 +39,8 @@ export function useChatSocket(
   const readyHandlerRef = useRef(onReadyMessage);
   const systemHandlerRef = useRef(onSystemMessage);
   const participantsHandlerRef = useRef(onParticipantsMessage);
+  const mapHandlerRef = useRef(onMapMessage); 
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,7 +48,8 @@ export function useChatSocket(
     readyHandlerRef.current = onReadyMessage;
     systemHandlerRef.current = onSystemMessage;
     participantsHandlerRef.current = onParticipantsMessage;
-  }, [onChatMessage, onReadyMessage, onSystemMessage, onParticipantsMessage]);
+    mapHandlerRef.current = onMapMessage;
+  }, [onChatMessage, onReadyMessage, onSystemMessage, onParticipantsMessage, onMapMessage]);
 
   const connect = useCallback(() => {
     if (isConnectingRef.current || stompClientRef.current?.connected) {
@@ -74,6 +79,7 @@ export function useChatSocket(
           ready: (data) => readyHandlerRef.current?.(data),
           system: (data) => systemHandlerRef.current?.(data),
           participants: (data) => participantsHandlerRef.current?.(data),
+          map: (data) => mapHandlerRef.current?.(data), 
           deleted: () => {
             console.warn("[WebSocket] 방 삭제 이벤트 수신");
             cleanupSubscriptions(subRefs.current);
@@ -117,7 +123,29 @@ export function useChatSocket(
     [status, roomId, jwtToken]
   );
 
+  const sendCoordinate = useCallback(
+    (coordPayload: {
+      roomId: number;
+      email: string;
+      name: string;
+      nickname: string;
+      latitude: number;
+      longitude: number;
+    }) => {
+      if (status !== "connected" || !stompClientRef.current?.connected) {
+        console.warn("[WebSocket] 연결 전이므로 좌표를 보낼 수 없음");
+        return;
+      }
+      stompClientRef.current.send(
+        mapPublish(roomId),
+        JSON.stringify(coordPayload),
+        { Authorization: `Bearer ${jwtToken}` }
+      );
+    },
+    [status, roomId, jwtToken]
+  );
+
   useEffect(() => () => disconnect(), [disconnect]);
 
-  return { connect, disconnect, sendMessage, status };
+  return { connect, disconnect, sendMessage, sendCoordinate, status };
 }

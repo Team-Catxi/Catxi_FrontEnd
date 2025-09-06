@@ -6,6 +6,7 @@ export type createChatRequest = {
 };
 export type createChatResponse = {
   data: {
+    roomId: number;
     startPoint: string;
     endPoint: string;
     recruitSize: number;
