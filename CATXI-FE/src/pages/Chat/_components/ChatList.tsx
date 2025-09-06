@@ -15,8 +15,13 @@ interface Props {
   messages: CombinedMessage[];
 }
 
-const isSystemMessage = (msg: CombinedMessage): msg is SystemMessage => {
-  return (msg as any).type === "SYSTEM";
+const isSystemMessage = (msg: any): msg is SystemMessage => {
+  const type = (msg as any).type;
+  const message = (msg as any).message;
+
+  return (
+    typeof type === "string" && type.replace(/\[|\]/g, "").toUpperCase() === "SYSTEM"
+  ) || message?.startsWith("[SYSTEM]");
 };
 
 const ChatList = ({ messages }: Props) => {
