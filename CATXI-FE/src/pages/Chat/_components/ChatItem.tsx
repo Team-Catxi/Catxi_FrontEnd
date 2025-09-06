@@ -15,37 +15,46 @@ interface ChatContext {
 interface Props {
   message: string;
   isMe: boolean;
-  email: string;
+  senderEmail: string;
   sentAt: string;
+  showName?: boolean;  
+  showTimestamp?: boolean;   
+  gapClass?: string;     
 }
 
-const ChatItem = ({ message, isMe, email, sentAt }: Props) => {
+const ChatItem = ({
+  message,
+  isMe,
+  senderEmail,
+  sentAt,
+  showName = true,
+  showTimestamp = true,
+  gapClass = "gap-3",
+}: Props) => {
   const { nicknameMap, hostEmail, myEmail } = useOutletContext<ChatContext>();
   const { roomId } = useParams();
 
-  const isMyself = email === myEmail;
+  const isMyself = senderEmail === myEmail;
   const isHost = myEmail === hostEmail;
-  const isTargetHost = email === hostEmail;
-
-  const displayName = getDisplayName(email, nicknameMap);
+  const isTargetHost = senderEmail === hostEmail;
+  const displayName = getDisplayName(senderEmail, nicknameMap);
 
   const { handleReport, handleKick, openModal } = useChatActions(
     Number(roomId),
-    email,
-    myEmail,
+    senderEmail,
+    myEmail
   );
 
   const handleNameClick = () => {
     if (isMyself) return;
-
     openModal(
       <ChatMemberModal
         name={displayName}
-        nickname={nicknameMap[email]}
+        nickname={nicknameMap[senderEmail]}
         isHost={isHost}
         isMyself={isMyself}
         roomId={parseInt(roomId ?? "0")}
-        targetUserId={email}
+        targetUserId={senderEmail}
         onReport={handleReport}
         onKick={isHost && !isTargetHost ? handleKick : undefined}
       />
@@ -54,35 +63,44 @@ const ChatItem = ({ message, isMe, email, sentAt }: Props) => {
 
   return (
     <div className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
-      <div className="flex items-center gap-[0.5rem] mb-1" onClick={handleNameClick}>
-        <p className="text-xs text-gray-600 cursor-pointer hover:underline">
-          {displayName}
-        </p>
-        {email === hostEmail && (
-          <span className="text-[0.625rem] font-medium text-[#FF8114] bg-[#FFF4EA] px-[0.205rem] py-[0.125rem] rounded">
-            방장
-          </span>
-        )}
-      </div>
+      {showName && (
+        <div
+          className="flex items-center gap-[0.5rem] mb-1"
+          onClick={handleNameClick}
+        >
+          <p className="text-xs text-gray-600 cursor-pointer hover:underline">
+            {displayName}
+          </p>
+          {senderEmail === hostEmail && (
+            <span className="text-[0.625rem] font-medium text-[#FF8114] bg-[#FFF4EA] px-[0.205rem] py-[0.125rem] rounded">
+              방장
+            </span>
+          )}
+        </div>
+      )}
 
       <div
-        className={`inline-flex items-end gap-[0.625rem] ${
+        className={`inline-flex items-end ${gapClass} ${
           isMe ? "justify-end" : "justify-start"
         }`}
       >
         {isMe ? (
           <>
-            <span className="text-[10px] text-gray-400 mb-0.5">
-              {formatTimestamp(sentAt)}
-            </span>
+            {showTimestamp && (
+              <span className="text-[10px] text-gray-400 mb-0.5">
+                {formatTimestamp(sentAt)}
+              </span>
+            )}
             <ChatBubble message={message} isMe />
           </>
         ) : (
           <>
             <ChatBubble message={message} isMe={false} />
-            <span className="text-[10px] text-gray-400 mb-0.5">
-              {formatTimestamp(sentAt)}
-            </span>
+            {showTimestamp && (
+              <span className="text-[10px] text-gray-400 mb-0.5">
+                {formatTimestamp(sentAt)}
+              </span>
+            )}
           </>
         )}
       </div>
