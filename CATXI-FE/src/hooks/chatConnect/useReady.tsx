@@ -32,17 +32,19 @@ export function useReady(
 
       const senderName = nicknameMap[msg.senderEmail] || msg.senderEmail;
 
-      openModal(
-        <ReadyRequestModal
-          senderName={senderName}
-          current={acceptCount}
-          total={totalParticipants}
-          onAccept={handleAccept}
-          onReject={handleReject}
-          isHost={myEmail === hostEmail}
-        />,
-        { dismissible: false }
-      );
+      if (msg.type === 'request') {
+        openModal(
+          <ReadyRequestModal
+            senderName={senderName}
+            current={acceptCount}
+            total={totalParticipants}
+            onAccept={handleAccept}
+            onReject={handleReject}
+            isHost={myEmail === hostEmail}
+          />,
+          { dismissible: false }
+        );
+      }
 
       if (msg.type === 'accept') {
         setAcceptCount((prev) => prev + 1);
