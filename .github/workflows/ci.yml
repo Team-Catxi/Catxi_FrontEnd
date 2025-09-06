@@ -33,6 +33,12 @@ jobs:
       - name: Build project
         working-directory: CATXI-FE
         run: pnpm run build
+        env:
+          VITE_SERVER_API_URL: ${{ secrets.VITE_SERVER_API_URL }}
+          VITE_SECRET_KEY: ${{ secrets.VITE_SECRET_KEY }}
+          VITE_REDIRECT_URI: ${{ secrets.VITE_REDIRECT_URI }}
+          VITE_KAKAO_REST_API_KEY: ${{ secrets.VITE_KAKAO_REST_API_KEY }}
+          VITE_KAKAO_JS_KEY: ${{ secrets.VITE_KAKAO_JS_KEY }}
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
@@ -41,4 +47,4 @@ jobs:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           channelId: live
           projectId: catxi-university-taxi-b0936
-          entryPoint: CATXI-FE 
+          entryPoint: CATXI-FE
