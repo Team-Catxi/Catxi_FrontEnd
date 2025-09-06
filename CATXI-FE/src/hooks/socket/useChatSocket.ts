@@ -1,12 +1,18 @@
 import { useEffect, useRef, useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SockJS from "sockjs-client";
 import * as webstomp from "webstomp-client";
-import type { Client, Subscription } from "webstomp-client";
-import { chatTopic, readyTopic, publishTopic, systemMessageTopic, participantsTopic } from "./topics.ts";
+import type { Client } from "webstomp-client";
+import { publishTopic } from "./topics.ts";
+import type { SubRefs } from "./subscriptions"; 
+import {
+  cleanupSubscriptions,
+  setupSubscriptions,
+} from "./subscriptions"; 
 
 const SERVER_URL = import.meta.env.VITE_SERVER_API_URL;
 
-export type ConnectionStatus = "idle" | "connecting" | "connected" | "error";
+export type ConnectionStatus = "idle" | "connecting" | "connected" | "error"; 
 
 export function useChatSocket(
   roomId: number,
@@ -17,16 +23,21 @@ export function useChatSocket(
   onParticipantsMessage?: (raw: any) => void
 ) {
   const stompClientRef = useRef<Client | null>(null);
-  const chatSubRef = useRef<Subscription | null>(null);
-  const readySubRef = useRef<Subscription | null>(null);
-  const systemMessageSubRef = useRef<Subscription | null>(null);
+  const subRefs = useRef<SubRefs>({
+    chat: null,
+    ready: null,
+    system: null,
+    participants: null,
+    deleted: null,
+  });
+
   const [status, setStatus] = useState<ConnectionStatus>("idle");
   const isConnectingRef = useRef(false);
   const chatHandlerRef = useRef(onChatMessage);
   const readyHandlerRef = useRef(onReadyMessage);
   const systemHandlerRef = useRef(onSystemMessage);
   const participantsHandlerRef = useRef(onParticipantsMessage);
-  const participantsSubRef = useRef<Subscription | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     chatHandlerRef.current = onChatMessage;
@@ -56,34 +67,21 @@ export function useChatSocket(
         isConnectingRef.current = false;
         setStatus("connected");
 
-        chatSubRef.current?.unsubscribe();
-        readySubRef.current?.unsubscribe();
-        systemMessageSubRef.current?.unsubscribe();
-        participantsSubRef.current?.unsubscribe();
+        cleanupSubscriptions(subRefs.current);
 
-        chatSubRef.current = stompClient.subscribe(
-          chatTopic(roomId),
-          (msg) => chatHandlerRef.current?.(JSON.parse(msg.body)),
-          { Authorization: `Bearer ${jwtToken}` }
-        );
-
-        readySubRef.current = stompClient.subscribe(
-          readyTopic(roomId),
-          (msg) => readyHandlerRef.current?.(JSON.parse(msg.body)),
-          { Authorization: `Bearer ${jwtToken}` }
-        );
-
-        systemMessageSubRef.current = stompClient.subscribe(
-          systemMessageTopic(roomId),
-          (msg) => systemHandlerRef.current?.(JSON.parse(msg.body)),
-          { Authorization: `Bearer ${jwtToken}` }
-        );
-
-        participantsSubRef.current = stompClient.subscribe(
-          participantsTopic(roomId),
-          (msg) => participantsHandlerRef.current?.(JSON.parse(msg.body)),
-          { Authorization: `Bearer ${jwtToken}` }
-        );
+        subRefs.current = setupSubscriptions(stompClient, roomId, jwtToken, {
+          chat: (data) => chatHandlerRef.current?.(data),
+          ready: (data) => readyHandlerRef.current?.(data),
+          system: (data) => systemHandlerRef.current?.(data),
+          participants: (data) => participantsHandlerRef.current?.(data),
+          deleted: () => {
+            console.warn("[WebSocket] 방 삭제 이벤트 수신");
+            cleanupSubscriptions(subRefs.current);
+            stompClient.disconnect();
+            setStatus("idle");
+            navigate("/home");
+          },
+        });
       },
       (err) => {
         console.error("[WebSocket] 연결 실패:", err);
@@ -91,18 +89,10 @@ export function useChatSocket(
         setStatus("error");
       }
     );
-  }, [roomId, jwtToken]);
+  }, [roomId, jwtToken, navigate]);
 
   const disconnect = useCallback(() => {
-    chatSubRef.current?.unsubscribe();
-    readySubRef.current?.unsubscribe();
-    systemMessageSubRef.current?.unsubscribe();
-    participantsSubRef.current?.unsubscribe();
-
-    chatSubRef.current = null;
-    readySubRef.current = null;
-    systemMessageSubRef.current = null;
-    participantsSubRef.current = null;
+    cleanupSubscriptions(subRefs.current);
 
     stompClientRef.current?.disconnect(() => {
       console.log("[WebSocket] 연결 해제됨");
