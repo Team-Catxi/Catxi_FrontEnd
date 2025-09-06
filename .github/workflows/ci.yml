@@ -2,7 +2,7 @@ name: pnpm Workflow
 
 on:
   push:
-    branches: [dev]   # dev 브랜치에 push될 때 실행
+    branches: [dev]  
 
 jobs:
   build_and_deploy:
@@ -39,5 +39,6 @@ jobs:
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
-          channelId: live    # dev 브랜치에서 live 배포라면 그대로, preview 원하면 preview로
+          channelId: live
           projectId: catxi-university-taxi-b0936
+          entryPoint: CATXI-FE 
