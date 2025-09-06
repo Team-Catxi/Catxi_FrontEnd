@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { fetchChatRooms } from '../../apis/chat/chatRooms';
 import type { ChatRoomResponse } from '../../types/chat/chatData';
 
@@ -13,10 +13,12 @@ export const useChatRooms = (params: GetChatRoomsParams) => {
   return useQuery<ChatRoomResponse, Error>({
     queryKey: ['chatRooms', params],
     queryFn: () => fetchChatRooms(params),
-    staleTime: 1000 * 60 * 1, 
-    refetchOnWindowFocus: false, 
+    staleTime: 1000 * 60 * 5,   
+    gcTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    retry: 1, 
-    enabled: !!params.direction && !!params.station && !!params.sort, 
+    retry: 0,
+    placeholderData: keepPreviousData,   
+    enabled: !!params.direction && !!params.station && !!params.sort,
   });
 };

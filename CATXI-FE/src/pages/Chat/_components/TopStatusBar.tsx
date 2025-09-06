@@ -7,13 +7,14 @@ import LeaveRoomModal from '../../../components/Modal/LeaveRoomModal';
 import RoomOutIcon from '../../../assets/icons/RoomOut.svg?react';
 import LocationBlockedModal from './Map/LocationBlockedModal';
 import { useState } from 'react';
+import { queryClient } from '../../../App'; 
 
 interface ChatContext {
   hostEmail: string;
   hostNickname: string;
   myEmail: string;
   chatRoom?: ChatRoomDetail;
-  setShowMap: (show: boolean) => void; 
+  setShowMap: (show: boolean) => void;
 }
 
 const TopStatusBar = () => {
@@ -33,6 +34,13 @@ const TopStatusBar = () => {
   const statusColor = status ? statusColorMap[status] : '#D1D5DB';
   const isHost = myEmail === chatRoom?.hostEmail;
 
+  const clearChatCache = (id: number) => {
+    queryClient.removeQueries({ queryKey: ['chatRoomDetail', id] });
+    queryClient.removeQueries({ queryKey: ['chatMessages', id] });
+    queryClient.removeQueries({ queryKey: ['participants', id] });
+    queryClient.removeQueries({ queryKey: ['myChatRoomId'] }); 
+  };
+
   const handleViewLocation = () => {
     if (status === 'READY_LOCKED') {
       setShowMap(true);
@@ -48,6 +56,7 @@ const TopStatusBar = () => {
         onConfirm={() => {
           leaveRoom(Number(roomId), {
             onSuccess: () => {
+              clearChatCache(Number(roomId)); 
               closeModal();
               navigate('/home');
             },
@@ -59,7 +68,6 @@ const TopStatusBar = () => {
         }}
         onCancel={closeModal}
       />,
-      
       { dismissible: false }
     );
   };
@@ -72,6 +80,7 @@ const TopStatusBar = () => {
         onConfirm={() => {
           deleteRoom(Number(roomId), {
             onSuccess: () => {
+              clearChatCache(Number(roomId)); 
               closeModal();
               navigate('/home');
             },
@@ -103,7 +112,7 @@ const TopStatusBar = () => {
         className="text-sm"
         style={{
           color: status === 'READY_LOCKED' ? '#000000' : '#9E9E9E',
-          cursor: 'pointer', 
+          cursor: 'pointer',
         }}
         onClick={handleViewLocation}
       >
