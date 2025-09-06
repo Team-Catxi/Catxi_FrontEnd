@@ -34,7 +34,6 @@ export default function MemberItem({
       { id: 1, name: "김예연", distanceKm: 12, active: true },
       { id: 2, name: "김예연", distanceKm: 13, active: false },
       { id: 3, name: "김예연", distanceKm: 1, active: false },
-      { id: 4, name: "김예연", distanceKm: 2, active: false },
     ],
     []
   );
@@ -47,7 +46,6 @@ export default function MemberItem({
 
   useEffect(() => {
     if (controlledSelected === undefined) {
-      // 외부 제어가 없으면 데이터 변경 시 첫번째로 초기화(원래 로직 유지)
       setUncontrolledSelected(data[0]?.id ?? null);
     }
   }, [data, controlledSelected]);
@@ -64,13 +62,13 @@ export default function MemberItem({
   };
 
   return (
-    <div className="w-full p-[1.25rem] rounded-[0.625rem] bg-white flex flex-col gap-[0.625rem] shadow-md">
+    <div className="p-[1.25rem] rounded-[0.625rem] bg-white flex flex-col gap-[0.625rem] shadow-md">
       <p className="text-gray-700 text-lg font-medium">
         채팅 멤버{" "}
         <span className="text-violet-600 font-semibold">{data.length}</span>
       </p>
 
-      <div className="grid grid-cols-4 gap-3">
+      <div className="flex gap-[1.25rem] ">
         {data.map((m) => {
           const isSelected = selected === m.id;
           const isDimmed = m.active === false && !isSelected;
