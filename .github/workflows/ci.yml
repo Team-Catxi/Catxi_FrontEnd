@@ -2,10 +2,10 @@ name: pnpm Workflow
 
 on:
   push:
-    branches: [dev]
+    branches: [dev]  
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -24,8 +24,27 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-          cache-dependency-path: CATXI-FE/pnpm-lock.yaml 
+          cache-dependency-path: CATXI-FE/pnpm-lock.yaml
 
       - name: Install dependencies
         working-directory: CATXI-FE
         run: pnpm install
+
+      - name: Build project
+        working-directory: CATXI-FE
+        run: pnpm run build
+        env:
+          VITE_SERVER_API_URL: ${{ secrets.VITE_SERVER_API_URL }}
+          VITE_SECRET_KEY: ${{ secrets.VITE_SECRET_KEY }}
+          VITE_REDIRECT_URI: ${{ secrets.VITE_REDIRECT_URI }}
+          VITE_KAKAO_REST_API_KEY: ${{ secrets.VITE_KAKAO_REST_API_KEY }}
+          VITE_KAKAO_JS_KEY: ${{ secrets.VITE_KAKAO_JS_KEY }}
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          channelId: live
+          projectId: catxi-university-taxi-b0936
+          entryPoint: CATXI-FE

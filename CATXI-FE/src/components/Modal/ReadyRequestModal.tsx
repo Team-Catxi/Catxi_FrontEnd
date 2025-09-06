@@ -58,7 +58,7 @@ const ReadyRequestModal = ({
     navigate('/home');
   };
 
-  const displayCurrent = current + 1; 
+  const displayCurrent = current;
   const displayTotal = total;
 
   return (
@@ -77,15 +77,18 @@ const ReadyRequestModal = ({
           <span>제한시간</span>
           <span className="text-[#7424F5] font-medium">{remainingTime}초</span>
         </div>
-        <div className="text-[1.375rem] text-[#424242] font-medium">
-          현재 수락 인원{' '}
-          <span className="text-[#7424F5]">
-            {displayCurrent}/{displayTotal}
-          </span>
+        <div className="flex flex-col items-center">
+          <div className="text-[1.375rem] text-[#424242] font-medium">
+            현재 수락 인원{' '}
+            <span className="text-[#7424F5]">
+              {displayCurrent}/{displayTotal}
+            </span>
+          </div>
+          <p className="text-[0.75rem] text-[#9E9E9E] mt-1">(방장 제외)</p>
         </div>
       </div>
 
-      {!isHost && ( 
+      {!isHost && (
         <div className="flex gap-[1.25rem]">
           <button
             className="flex-1 px-[2.75rem] py-[0.625rem] rounded-lg text-[#7424F5] bg-[#F5F5F5]"

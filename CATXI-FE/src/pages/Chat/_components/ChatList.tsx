@@ -4,6 +4,8 @@ import UserSystemMessageItem from "./UserSystemMessage";
 import { useOutletContext, useParams } from "react-router-dom";
 import type { ChatMessage } from "../../../types/chat/chat";
 import type { SystemMessage } from "../../../types/systemMessage/systemMessage";
+import { isSystemMessage } from "../../../utils/chat/isSystemMessage";
+import { getChatItemProps } from "../../../utils/chat/getChatItemprops";
 
 type CombinedMessage = ChatMessage | SystemMessage;
 
@@ -14,10 +16,6 @@ interface ChatContext {
 interface Props {
   messages: CombinedMessage[];
 }
-
-const isSystemMessage = (msg: CombinedMessage): msg is SystemMessage => {
-  return (msg as any).type === "SYSTEM";
-};
 
 const ChatList = ({ messages }: Props) => {
   const listRef = useRef<HTMLDivElement>(null);
@@ -33,24 +31,37 @@ const ChatList = ({ messages }: Props) => {
   }, [messages, roomId]);
 
   const renderedMessages = useMemo(() => {
-    return messages.map((msg) => {
+    return messages.map((msg, idx) => {
       if (isSystemMessage(msg)) {
+        const sysMsg = msg as SystemMessage;
         return (
           <UserSystemMessageItem
-            key={`system-${msg.timestamp}`}
-            content={msg.content}
+            key={`system-${sysMsg.createdAt}`}
+            content={sysMsg.message}
           />
         );
       }
 
       const chatMsg = msg as ChatMessage;
+      const prevMsg = idx > 0 ? messages[idx - 1] : null;
+      const nextMsg = idx < messages.length - 1 ? messages[idx + 1] : null;
+
+      const { showName, showTimestamp, gapClass } = getChatItemProps(
+        chatMsg,
+        prevMsg,
+        nextMsg
+      );
+
       return (
         <ChatItem
           key={`chat-${chatMsg.messageId ?? chatMsg.sentAt}`}
           message={chatMsg.message}
           isMe={chatMsg.isMine ?? false}
-          email={chatMsg.email}
+          senderEmail={chatMsg.email}
           sentAt={chatMsg.sentAt}
+          showName={showName}
+          showTimestamp={showTimestamp}
+          gapClass={gapClass}
         />
       );
     });

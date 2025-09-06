@@ -11,8 +11,8 @@ const HomePage = () => {
   const [selectedLocations, setSelectedLocations] = useState<
     Record<"FROM_SCHOOL" | "TO_SCHOOL", string | null>
   >({
-    FROM_SCHOOL: "YEOKGOK_ST",
-    TO_SCHOOL: "YEOKGOK_ST",
+    FROM_SCHOOL: "ALL",
+    TO_SCHOOL: "ALL",
   });
   const [sort, setSort] = useState<"departAt" | "createdTime">("departAt");
   const page = 0;

@@ -11,14 +11,21 @@ import { useCreateChat } from "../../hooks/mutation/useCreateChat";
 import { labelToLocationMap } from "../MyPage/_utils/location";
 import { parseTimeToISOString } from "./_constants/time";
 import { useNavigate } from "react-router-dom";
+import { useSaveDepart } from "../../hooks/mutation/coordinates/useSaveDepart";
+import { locationCoordinatesMap } from "../../constants/coordinates";
+
 const CreateChat = () => {
   const navigate = useNavigate();
   const { answers, clearAnswer } = useChatStore();
   const { startPoint, endPoint, size, isToday, time } = answers;
+
   const { createChatRoom } = useCreateChat();
+  const { mutate: saveDepart } = useSaveDepart();
+
   const [allSet, setAllSet] = useState(false);
   const [current, setCurrent] = useState(1);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
+
   const keys: (keyof typeof answers)[] = [
     "startPoint",
     "endPoint",
@@ -27,34 +34,55 @@ const CreateChat = () => {
   ];
   const totalQuestions = 4;
   const progressWidth = `${(current / totalQuestions) * 100}%`;
-  useEffect(() => {
-    if (isTimePickerOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
 
+  useEffect(() => {
+    document.body.style.overflow = isTimePickerOpen ? "hidden" : "auto";
     return () => {
       document.body.style.overflow = "auto";
     };
   }, [isTimePickerOpen]);
+
   const handleMovePage = (offset: number) => {
-    console.log(answers);
     const next = current + offset;
+
     if (allSet) {
       if (offset > 0) {
-        createChatRoom({
-          startPoint: labelToLocationMap[startPoint],
-          endPoint: labelToLocationMap[endPoint],
-          recruitSize: size,
-          departAt: parseTimeToISOString(time, isToday),
-        });
+        createChatRoom(
+          {
+            startPoint: labelToLocationMap[startPoint],
+            endPoint: labelToLocationMap[endPoint],
+            recruitSize: size,
+            departAt: parseTimeToISOString(time, isToday),
+          },
+          {
+            onSuccess: (res) => {
+              const newRoomId = res.data.roomId;
+              console.log("생성된 roomId:", newRoomId);
+
+              const locationKey = labelToLocationMap[startPoint];
+              if (locationKey) {
+                const coords = locationCoordinatesMap[locationKey];
+                if (coords) {
+                  saveDepart(
+                    { roomId: newRoomId, body: coords },
+                    {
+                      onSuccess: () => console.log("출발 좌표 저장 성공"),
+                      onError: (err) =>
+                        console.error("출발 좌표 저장 실패", err),
+                    }
+                  );
+                }
+              }
+            },
+          }
+        );
       } else if (offset < 0) {
         setCurrent(1);
         setAllSet(false);
       }
       return;
     }
+
     if (offset > 0 && current === totalQuestions) {
       setAllSet(true);
       return;
@@ -63,6 +91,7 @@ const CreateChat = () => {
       setCurrent(next);
     }
   };
+
   const handleRouteMove = () => {
     if (startPoint) {
       const isConfirmed = window.confirm(
@@ -76,6 +105,7 @@ const CreateChat = () => {
       navigate("/home");
     }
   };
+
   return (
     <div className="w-full h-full relative">
       <div className="h-16.5 w-full border-b-2 border-b-[#E0E0E0] relative flex justify-center items-center">
@@ -91,15 +121,17 @@ const CreateChat = () => {
         </div>
         <p className="font-regular text-xl font-medium">채팅방 생성</p>
       </div>
+
       <div className="w-full h-[calc(100vh-66px)] px-6.75 py-10 flex flex-col overflow-y-auto">
         <div className="flex-1">
           {current < 3 && <SelectPlace type={current as 1 | 2} />}
-          {current == 3 && (
+          {current === 3 && (
             <SelectTime onOpen={() => setIsTimePickerOpen(true)} />
           )}
-          {current == 4 && !allSet && <SelectMember />}
+          {current === 4 && !allSet && <SelectMember />}
           {allSet && <AllSet />}
         </div>
+
         <div className="flex flex-col gap-2.5 mt-6">
           {current > 1 && (
             <button

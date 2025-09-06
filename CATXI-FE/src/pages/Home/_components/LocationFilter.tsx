@@ -7,11 +7,11 @@ interface Props {
   onSelectSort: (sort: 'departAt' | 'createdTime') => void;
 }
 
-const locations = ['YEOKGOK_ST', 'SOSA_ST', 'ETC'];
+const locations = ['ALL', 'YEOKGOK_ST', 'SOSA_ST'];
 const locationDisplayMap: Record<string, string> = {
+  ALL: '전체',
   YEOKGOK_ST: '역곡역',
   SOSA_ST: '소사역',
-  ETC: '그 외',
 };
 
 
@@ -27,10 +27,10 @@ const LocationFilter: React.FC<Props> = ({
         {locations.map((loc) => (
           <button
             key={loc}
-            className={`px-[0.625rem] py-[0.313rem] border border-[#E0E0E0] rounded-[30px] font-md text-[14px] ${
+            className={`px-[0.625rem] py-[0.313rem] rounded-[30px] font-medium text-[0.875rem] leading-[17px] ${
               (station ?? 'SOSA_ST') === loc
-                ? 'bg-[#424242] text-white'
-                : 'bg-[#FAFAFA] text-[#9E9E9E]'
+                ? 'bg-[#7424F5] text-white'
+                : 'bg-[#F1F1F1] text-[#9E9E9E]'
             }`}
             onClick={() => onSelectLocation(loc)}
           >
