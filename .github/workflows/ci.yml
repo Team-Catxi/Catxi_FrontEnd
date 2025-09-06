@@ -2,10 +2,10 @@ name: pnpm Workflow
 
 on:
   push:
-    branches: [dev]
+    branches: [dev]   # dev 브랜치에 push될 때 실행
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -24,8 +24,20 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-          cache-dependency-path: CATXI-FE/pnpm-lock.yaml 
+          cache-dependency-path: CATXI-FE/pnpm-lock.yaml
 
       - name: Install dependencies
         working-directory: CATXI-FE
         run: pnpm install
+
+      - name: Build project
+        working-directory: CATXI-FE
+        run: pnpm run build
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          channelId: live    # dev 브랜치에서 live 배포라면 그대로, preview 원하면 preview로
+          projectId: catxi-university-taxi-b0936
