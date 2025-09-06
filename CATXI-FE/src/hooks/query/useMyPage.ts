@@ -7,9 +7,13 @@ import { getHistoryList } from "../../apis/history";
 export const useGetMyPage = () => {
   return useQuery<GetMemberResponse, Error>({
     queryKey: ["myPage"],
-    queryFn: () => getMyPageList(),
+    queryFn: getMyPageList,
+    staleTime: 1000 * 60,       
+    refetchOnWindowFocus: false, 
+    refetchOnReconnect: false,  
   });
 };
+
 
 export const useGetHistory = () => {
   return useInfiniteQuery<GetHistoryResponse, Error>({

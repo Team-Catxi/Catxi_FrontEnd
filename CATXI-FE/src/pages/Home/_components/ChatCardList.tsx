@@ -70,7 +70,7 @@ const ChatCardList = ({
 
   if (isError) {
     return (
-      <div className="flex justify-center items-center h-[70vh]">
+      <div className="flex justify-center items-center h-[65vh]">
         <div className="flex flex-col items-center gap-4 text-center">
           <Logo />
           <LogoText className="w-[10rem] h-auto" />
@@ -93,7 +93,7 @@ const ChatCardList = ({
 
   if (!futureRooms.length) {
     return (
-      <div className="flex justify-center items-center p-4 h-[60vh] custom-scrollbar">
+      <div className="flex justify-center items-center p-4 h-[70vh] custom-scrollbar">
         <div className="flex flex-col justify-center items-center gap-2 text-[#9E9E9E]">
           <NoContent />
           <p>아직 생성된 채팅방이 없어요</p>
