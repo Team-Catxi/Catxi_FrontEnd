@@ -31,14 +31,9 @@ const ReadyLockedBox = ({ departAt }: Props) => {
     const minute = departDate.getMinutes().toString().padStart(2, "0");
     const formatted = `${hour}시 ${minute}분 출발`;
 
-    let remainText: string;
-    if (remainingSec === 0) {
-      remainText = "종료";
-    } else if (remainingSec <= 60) {
-      remainText = `${remainingSec}초`;
-    } else {
-      remainText = `${Math.floor(remainingSec / 60)}분`;
-    }
+    const remainMin = Math.floor(remainingSec / 60);
+    const remainText =
+      remainingSec <= 60 ? `${remainingSec}초` : `${remainMin}분`;
 
     const isUrgent = remainingSec <= 600;
 
@@ -63,7 +58,7 @@ const ReadyLockedBox = ({ departAt }: Props) => {
         <p className="text-[0.75rem] font-regular text-[#F5F5F5]">남은 시간</p>
         <p
           className="text-[1.25rem] font-medium"
-          style={{ color: isUrgent || remainingSec === 0 ? "#FF5252" : "#FAFAFA" }}
+          style={{ color: isUrgent ? "#FF5252" : "#FAFAFA" }}
         >
           {remainText}
         </p>
