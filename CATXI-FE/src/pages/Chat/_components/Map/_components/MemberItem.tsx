@@ -41,6 +41,7 @@ export default function MemberItem({
         isDimmed ? "opacity-60" : ""
       }`}
     >
+      {/* 아이콘 */}
       <div className="w-[4rem] h-[4rem]  flex items-center justify-center transition-all">
         <img
           src={
@@ -55,6 +56,7 @@ export default function MemberItem({
         />
       </div>
 
+      {/* 이름 (3글자 초과 ... 처리) */}
       <div
         className={`text-[13px] font-medium ${
           selected ? "text-violet-600" : "text-gray-500"
@@ -64,6 +66,7 @@ export default function MemberItem({
         {name}
       </div>
 
+      {/* 거리 뱃지 */}
       <div
         className={`px-3 h-6 leading-6 rounded-full text-[12px] font-semibold mt-0.5 ${
           selected ? "bg-violet-600 text-white" : "bg-gray-300 text-white"

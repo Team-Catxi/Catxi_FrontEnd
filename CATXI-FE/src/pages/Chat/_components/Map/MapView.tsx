@@ -1,4 +1,3 @@
-import MemberCard from "./_components/MemberCard";
 interface MapViewProps {
   onClose: () => void;
   roomId: number;
@@ -17,8 +16,6 @@ const MapView = ({ onClose, roomId }: MapViewProps) => {
       >
         임시 닫기
       </button>
-
-      <MemberCard />
     </div>
   );
 };

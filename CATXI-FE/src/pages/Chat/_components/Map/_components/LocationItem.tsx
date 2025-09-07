@@ -6,7 +6,7 @@ interface LocationItemProps {
   name: string;
   selected: boolean;
   email?: string;
-  myEmail?: string;
+  myEmail?: string; //TODO: 내 이메일확인 로직 상위로 올려서 props로 active 받기
   className?: string;
   onClick?: () => void; // ✅ 클릭 핸들러 추가
 }
