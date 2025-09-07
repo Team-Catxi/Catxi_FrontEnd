@@ -1,9 +1,9 @@
 export interface ReadyMessage {
-  type: 'request' | 'accept' | 'reject';
+  type: 'READY_REQUEST' | 'READY_ACCEPT' | 'READY_DENY';
   roomId: number;
   senderId: number;
   senderEmail: string;
   senderName: string;
   content: string;
-  timestamp: string;
+  sentAt: string; 
 }

@@ -27,7 +27,11 @@ const TopStatusBar = () => {
 
   const [showBlockedModal, setShowBlockedModal] = useState(false);
 
-  const current = chatRoom?.currentSize ?? 0;
+  const current =
+    chatRoom?.currentSize ??
+    chatRoom?.participantEmails?.length ??
+    0;
+    
   const total = (chatRoom?.recruitSize ?? 0) + 1;
   const status = chatRoom?.roomStatus;
   const statusText = status ? statusTextMap[status] : '';
@@ -39,6 +43,7 @@ const TopStatusBar = () => {
     queryClient.removeQueries({ queryKey: ['chatMessages', id] });
     queryClient.removeQueries({ queryKey: ['participants', id] });
     queryClient.removeQueries({ queryKey: ['myChatRoomId'] }); 
+    queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
   };
 
   const handleViewLocation = () => {
@@ -56,9 +61,11 @@ const TopStatusBar = () => {
         onConfirm={() => {
           leaveRoom(Number(roomId), {
             onSuccess: () => {
-              clearChatCache(Number(roomId)); 
               closeModal();
-              navigate('/home');
+              setTimeout(() => {
+                clearChatCache(Number(roomId));
+                navigate('/home');
+              }, 0);
             },
             onError: () => {
               closeModal();
@@ -80,9 +87,11 @@ const TopStatusBar = () => {
         onConfirm={() => {
           deleteRoom(Number(roomId), {
             onSuccess: () => {
-              clearChatCache(Number(roomId)); 
               closeModal();
-              navigate('/home');
+              setTimeout(() => {
+                clearChatCache(Number(roomId));
+                navigate('/home');
+              }, 0);
             },
             onError: () => {
               closeModal();
@@ -91,7 +100,8 @@ const TopStatusBar = () => {
           });
         }}
         onCancel={closeModal}
-      />
+      />,
+      { dismissible: false }
     );
   };
 

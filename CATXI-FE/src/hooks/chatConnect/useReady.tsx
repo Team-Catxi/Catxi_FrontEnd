@@ -1,8 +1,10 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useModal } from '../../contexts/ModalContext';
 import ReadyRequestModal from '../../components/Modal/ReadyRequestModal';
 import { useReadyAccept, useReadyReject } from '../mutation/chat/useReadyQuest';
 import type { ReadyMessage } from '../../types/chat/readyMessage';
+import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function useReady(
   roomId: number,
@@ -11,15 +13,14 @@ export function useReady(
   nicknameMap: Record<string, string>,
   totalParticipants: number,
 ) {
-  const [acceptCount, setAcceptCount] = useState(0);
-
   const { openModal } = useModal();
   const { mutate: acceptReady } = useReadyAccept();
   const { mutate: rejectReady } = useReadyReject();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const handleAccept = useCallback(() => {
     acceptReady(roomId);
-    setAcceptCount((prev) => prev + 1);
   }, [acceptReady, roomId]);
 
   const handleReject = useCallback(() => {
@@ -32,26 +33,30 @@ export function useReady(
 
       const senderName = nicknameMap[msg.senderEmail] || msg.senderEmail;
 
-      if (msg.type === 'request') {
-        openModal(
-          <ReadyRequestModal
-            senderName={senderName}
-            current={acceptCount}
-            total={totalParticipants}
-            onAccept={handleAccept}
-            onReject={handleReject}
-            isHost={myEmail === hostEmail}
-          />,
-          { dismissible: false }
-        );
+      if (msg.type === 'READY_REQUEST') {
+        if (myEmail !== hostEmail) {
+          const chatRoomDetail: any = queryClient.getQueryData(['chatRoomDetail', roomId]);
+          const current = chatRoomDetail?.data?.acceptCount ?? 0;
+
+          openModal(
+            <ReadyRequestModal
+              senderName={senderName}
+              current={current}
+              total={totalParticipants}
+              onAccept={handleAccept}
+              onReject={handleReject}
+            />,
+            { dismissible: false }
+          );
+        }
       }
 
-      if (msg.type === 'accept') {
-        setAcceptCount((prev) => prev + 1);
+      if (msg.type === 'READY_DENY') {
+        navigate('/home');
       }
     },
-    [nicknameMap, myEmail, hostEmail, acceptCount, totalParticipants, handleAccept, handleReject, openModal]
+    [nicknameMap, myEmail, hostEmail, totalParticipants, handleAccept, handleReject, openModal, navigate, queryClient, roomId]
   );
 
-  return { acceptCount, handleAccept, handleReject, handleReadyMessage };
+  return { handleAccept, handleReject, handleReadyMessage };
 }

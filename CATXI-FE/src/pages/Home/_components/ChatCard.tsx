@@ -9,9 +9,10 @@ import JoinChatModalContent from "./JoinChatModal";
 
 interface Props {
   data: ChatRoomItem;
+  myRoomId?: number | null; 
 }
 
-const ChatCard = ({ data }: Props) => {
+const ChatCard = ({ data, myRoomId }: Props) => {
   const { openModal } = useModal();
 
   const handleJoinClick = () => {
@@ -106,7 +107,11 @@ const ChatCard = ({ data }: Props) => {
           </div>
 
           <div className="mt-[1.25rem]">
-            <ChatJoinButton status={data.status} onClick={handleJoinClick} />
+            <ChatJoinButton
+              myRoomId={myRoomId}
+              roomId={data.roomId}
+              onClick={handleJoinClick}
+            />
           </div>
         </div>
       </div>
