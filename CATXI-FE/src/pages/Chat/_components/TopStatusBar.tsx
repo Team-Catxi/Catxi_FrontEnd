@@ -47,12 +47,13 @@ const TopStatusBar = () => {
   };
 
   const handleViewLocation = () => {
-    if (status === 'READY_LOCKED') {
+    if (status === 'MATCHED' || status === 'READY_LOCKED') {
       setShowMap(true);
     } else {
       setShowBlockedModal(true);
     }
   };
+
 
   const handleLeave = () => {
     if (!roomId) return;
@@ -121,7 +122,7 @@ const TopStatusBar = () => {
       <button
         className="text-sm"
         style={{
-          color: status === 'READY_LOCKED' ? '#000000' : '#9E9E9E',
+          color: status === 'MATCHED' || status === 'READY_LOCKED' ? '#000000' : '#9E9E9E',
           cursor: 'pointer',
         }}
         onClick={handleViewLocation}
