@@ -57,7 +57,12 @@ export interface ChatRoomList {
     size: number;
     hasNext: boolean;
 };
+
+export interface ChatRoomData {
+  myRoomId: number;
+  rooms: ChatRoomList;
+}
  
 export type ChatMessagesResponse = ApiResponse<ChatMessageItem[]>;
 
-export type ChatRoomResponse = ApiResponse<ChatRoomList>;
+export type ChatRoomResponse = ApiResponse<ChatRoomData>;
