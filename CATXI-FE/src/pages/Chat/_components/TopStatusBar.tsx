@@ -27,7 +27,11 @@ const TopStatusBar = () => {
 
   const [showBlockedModal, setShowBlockedModal] = useState(false);
 
-  const current = chatRoom?.currentSize ?? 0;
+  const current =
+    chatRoom?.currentSize ??
+    chatRoom?.participantEmails?.length ??
+    0;
+    
   const total = (chatRoom?.recruitSize ?? 0) + 1;
   const status = chatRoom?.roomStatus;
   const statusText = status ? statusTextMap[status] : '';

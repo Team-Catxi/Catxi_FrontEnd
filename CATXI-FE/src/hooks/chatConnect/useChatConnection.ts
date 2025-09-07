@@ -10,6 +10,7 @@ import { useChatMessagesHandler } from './useChatMessagesHandler';
 import { useReady } from './useReady';
 import { buildChatPayload } from '../socket/payloadBuilder';
 import { parseChatMessage, parseReadyMessage } from '../../utils/chat/parseSocketMessages';
+import { queryClient } from '../../App'; 
 
 export function useChatConnection(roomId: number) {
   const email = useUserEmail();
@@ -45,12 +46,12 @@ export function useChatConnection(roomId: number) {
 
   const { messages, setMessages, handleMessage } = useChatMessagesHandler(email ?? '');
 
-  const { acceptCount, handleReadyMessage } = useReady(
+  const { handleReadyMessage } = useReady(
     roomId,
     email ?? '',
     hostEmail,
     nicknameMap,
-    chatRoomDetail?.data?.currentSize ?? 1,
+    chatRoomDetail?.data?.currentSize ?? 0,
   );
 
   useEffect(() => {
@@ -59,11 +60,29 @@ export function useChatConnection(roomId: number) {
     }
   }, [chatHistory, email, setMessages]);
 
+  const handleParticipantsMessage = (raw: any) => {
+    const updatedCount = raw.participantNicknames?.length ?? 0;
+
+    queryClient.setQueryData(['chatRoomDetail', roomId], (prev: any) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        data: {
+          ...prev.data,
+          currentSize: updatedCount,
+          participantNicknames: raw.participantNicknames, 
+        },
+      };
+    });
+  };
+
   const { connect, disconnect, sendMessage, status } = useChatSocket(
     roomId,
     Storage.getAccessToken()!,
     (raw) => handleMessage(parseChatMessage(raw, email ?? '', nicknameMap)),
-    (raw) => handleReadyMessage(parseReadyMessage(raw)),
+    (raw) => handleReadyMessage(parseReadyMessage(raw)), 
+    undefined, 
+    (raw) => handleParticipantsMessage(raw), 
   );
 
   useEffect(() => {
@@ -84,7 +103,6 @@ export function useChatConnection(roomId: number) {
     hostNickname,
     chatRoomDetail: chatRoomDetail?.data,
     refetchChatRoomDetail,
-    acceptCount,
     isLoading,
     isError,
     status,
