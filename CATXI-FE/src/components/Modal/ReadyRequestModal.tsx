@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useModal } from '../../contexts/ModalContext';
-import { useNavigate } from 'react-router-dom';
 import Time from '../../assets/icons/Time.svg?react';
 
 interface Props {
@@ -10,7 +9,6 @@ interface Props {
   onAccept: () => void;
   onReject: () => void;
   timeoutSec?: number;
-  isHost: boolean; 
 }
 
 const ReadyRequestModal = ({
@@ -19,11 +17,9 @@ const ReadyRequestModal = ({
   onAccept,
   onReject,
   timeoutSec = 20,
-  isHost = false,
 }: Props) => {
   const [remainingTime, setRemainingTime] = useState(timeoutSec);
   const { closeModal } = useModal();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -32,11 +28,7 @@ const ReadyRequestModal = ({
           clearInterval(timer);
           setTimeout(() => {
             closeModal();
-
-            if (!isHost) {
-              onReject();
-              navigate('/home');
-            }
+            onReject(); 
           }, 0);
           return 0;
         }
@@ -45,7 +37,7 @@ const ReadyRequestModal = ({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [onReject, isHost, closeModal, navigate]);
+  }, [onReject, closeModal]);
 
   const handleAccept = () => {
     onAccept();
@@ -55,10 +47,9 @@ const ReadyRequestModal = ({
   const handleReject = () => {
     onReject();
     closeModal();
-    navigate('/home');
   };
 
-  const displayCurrent = current;
+  const displayCurrent = (current ?? 0) + 1;
   const displayTotal = total;
 
   return (
@@ -88,22 +79,20 @@ const ReadyRequestModal = ({
         </div>
       </div>
 
-      {!isHost && (
-        <div className="flex gap-[1.25rem]">
-          <button
-            className="flex-1 px-[2.75rem] py-[0.625rem] rounded-lg text-[#7424F5] bg-[#F5F5F5]"
-            onClick={handleReject}
-          >
-            거절하기
-          </button>
-          <button
-            className="flex-1 px-[2.75rem] py-[0.625rem] rounded-lg bg-[#7424F5] text-[#FAFAFA]"
-            onClick={handleAccept}
-          >
-            수락하기
-          </button>
-        </div>
-      )}
+      <div className="flex gap-[1.25rem]">
+        <button
+          className="flex-1 px-[2.75rem] py-[0.625rem] rounded-lg text-[#7424F5] bg-[#F5F5F5]"
+          onClick={handleReject}
+        >
+          거절하기
+        </button>
+        <button
+          className="flex-1 px-[2.75rem] py-[0.625rem] rounded-lg bg-[#7424F5] text-[#FAFAFA]"
+          onClick={handleAccept}
+        >
+          수락하기
+        </button>
+      </div>
     </div>
   );
 };

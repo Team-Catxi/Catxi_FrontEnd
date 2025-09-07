@@ -28,6 +28,6 @@ export function parseReadyMessage(raw: any): ReadyMessage {
     senderEmail: raw.senderEmail,
     senderName: raw.senderName,
     content: raw.content,
-    timestamp: raw.timestamp,
+    sentAt: raw.timestamp,
   };
 }
