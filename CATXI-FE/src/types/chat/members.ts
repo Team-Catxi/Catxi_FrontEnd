@@ -1,4 +1,10 @@
-// 서버 응답 DTO (distance = km 고정)
+import type { ApiResponse } from "../apiResponse";
+
+export interface ApiMembersPayload {
+  departure: string;
+  coordinates: ApiMember[];
+}
+
 export type ApiMember = {
   roomId: number;
   email: string;
@@ -9,13 +15,14 @@ export type ApiMember = {
   distance: number; // km
 };
 
-// UI 공통 모델
+export type GetMembersResponse = ApiResponse<ApiMembersPayload>;
+
 export type MemberLite = {
-  id: string; // `${roomId}:${email}` 등 안정 키
-  name: string; // name || nickname || email id
+  id: string;
+  name: string;
   email: string;
   nickname?: string;
   lat: number;
   lng: number;
-  distanceKm: number; // km 고정
+  distanceKm: number;
 };

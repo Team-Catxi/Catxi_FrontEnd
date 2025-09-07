@@ -29,13 +29,13 @@ export const mockApiMembers: ApiMember[] = [
     longitude: 126.979,
     distance: 3.7,
   },
-  {
-    roomId: 101,
-    email: "yeyeon2@example.com",
-    name: "김예연",
-    nickname: "예예",
-    latitude: 37.563,
-    longitude: 126.98,
-    distance: 12,
-  },
+  //   {
+  //     roomId: 101,
+  //     email: "yeyeon2@example.com",
+  //     name: "김예연",
+  //     nickname: "예예",
+  //     latitude: 37.563,
+  //     longitude: 126.98,
+  //     distance: 12,
+  //   },
 ];

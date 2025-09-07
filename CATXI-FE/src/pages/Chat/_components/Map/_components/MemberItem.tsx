@@ -1,10 +1,14 @@
 import ClickMember from "../../../../../assets/icons/ClickMember.svg";
 import Member from "../../../../../assets/icons/Member.svg";
 
-export interface MemberLite {
-  id: string | number;
+interface MemberLite {
+  roomId: number;
+  email: string;
   name: string;
-  distanceKm: number;
+  nickname: string;
+  latitude: number;
+  longitude: number;
+  distance: number;
   active?: boolean;
 }
 
@@ -29,7 +33,7 @@ export default function MemberItem({
   maskName = true,
 }: MemberItemProps) {
   const name = maskName ? mask(member.name) : member.name;
-  const km = Math.round(member.distanceKm);
+  const km = Math.round(member.distance);
   const isDimmed = member.active === false && !selected;
 
   return (
@@ -37,12 +41,12 @@ export default function MemberItem({
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className={`group flex  flex-col items-center gap-1  ${
+      className={`group flex flex-col items-center gap-1 ${
         isDimmed ? "opacity-60" : ""
       }`}
     >
       {/* 아이콘 */}
-      <div className="w-[4rem] h-[4rem]  flex items-center justify-center transition-all">
+      <div className="w-[4rem] h-[4rem] flex items-center justify-center transition-all">
         <img
           src={
             selected

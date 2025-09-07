@@ -1,17 +1,16 @@
-import MemberLocation from "../../../../../assets/icons/MemberLocation.svg"; // 회색
-import YourLocation from "../../../../../assets/icons/YourLocation.svg"; // 파란색
-import ClickMemberLocation from "../../../../../assets/icons/ClickLocation.svg"; // 보라색(선택)
+import MemberLocation from "../../../../../assets/icons/MemberLocation.svg";
+import YourLocation from "../../../../../assets/icons/YourLocation.svg";
+import ClickMemberLocation from "../../../../../assets/icons/ClickLocation.svg";
 
 interface LocationItemProps {
   name: string;
   selected: boolean;
-  email?: string;
-  myEmail?: string; //TODO: 내 이메일확인 로직 상위로 올려서 props로 active 받기
+  email: string;
+  myEmail: string;
   className?: string;
-  onClick?: () => void; // ✅ 클릭 핸들러 추가
+  onClick: () => void;
 }
 
-// 두번째 글자만 * 처리
 function maskSecond(name: string) {
   if (!name) return "";
   const arr = [...name];
@@ -44,7 +43,6 @@ const LocationItem = ({
   const displayName = maskSecond(name);
 
   return (
-    // 커스텀오버레이에서 클릭 가능하도록 버튼 역할 부여
     <div
       role="button"
       tabIndex={0}
@@ -63,7 +61,7 @@ const LocationItem = ({
       <img
         src={iconSrc}
         alt={selected ? "선택한 사용자 위치" : self ? "내 위치" : "멤버 위치"}
-        className="w-[72px] h-[72px] pointer-events-none" // 클릭은 부모가 받음
+        className="w-[72px] h-[72px] pointer-events-none"
         draggable={false}
         onDragStart={(e) => e.preventDefault()}
       />

@@ -1,13 +1,16 @@
 import LocationItem from "./LocationItem";
-import { type MemberLite } from "./MemberItem"; // 또는 './members.types'
+import type { ApiMember } from "../../../../../types/chat/members";
 
 interface LocationLayerProps {
-  members: MemberLite[];
-  selectedId: string | number | null;
-  onSelect: (id: string | number | null) => void;
+  members: ApiMember[]; // ✅ 서버 스키마 사용
+  selectedId: string | null; // ✅ 안정 키 문자열
+  onSelect: (id: string | null) => void;
   myEmail?: string;
   className?: string;
 }
+
+// 안정 키: roomId + email
+const makeStableId = (m: ApiMember) => `${m.roomId}:${m.email}`;
 
 export default function LocationLayer({
   members,
@@ -16,21 +19,25 @@ export default function LocationLayer({
   myEmail,
   className = "",
 }: LocationLayerProps) {
-  const handleClick = (id: string | number) => {
+  const handleClick = (id: string) => {
     onSelect(selectedId === id ? null : id);
   };
 
   return (
     <div className={className}>
-      {members.map((m) => (
-        <LocationItem
-          key={m.id}
-          name={m.name}
-          selected={selectedId === m.id}
-          myEmail={myEmail}
-          onClick={() => handleClick(m.id)}
-        />
-      ))}
+      {members.map((m) => {
+        const id = makeStableId(m);
+        return (
+          <LocationItem
+            key={id}
+            name={m.name}
+            selected={selectedId === id}
+            email={m.email}
+            myEmail={myEmail || ""}
+            onClick={() => handleClick(id)}
+          />
+        );
+      })}
     </div>
   );
 }

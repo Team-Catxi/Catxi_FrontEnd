@@ -1,11 +1,15 @@
-import MemberItem, { type MemberLite } from "./MemberItem";
+import MemberItem from "./MemberItem";
+import type { ApiMember } from "../../../../../types/chat/members";
 
 interface MemberCardProps {
-  members: MemberLite[];
-  selectedId: string | number | null;
-  onSelect: (id: string | number | null) => void;
+  members: ApiMember[];
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
   className?: string;
 }
+
+// 안정 키 생성기: roomId + email
+const makeStableId = (m: ApiMember) => `${m.roomId}:${m.email}`;
 
 export default function MemberCard({
   members,
@@ -13,7 +17,7 @@ export default function MemberCard({
   onSelect,
   className = "",
 }: MemberCardProps) {
-  const handleSelect = (id: string | number) => {
+  const handleSelect = (id: string) => {
     onSelect(selectedId === id ? null : id);
   };
 
@@ -27,15 +31,18 @@ export default function MemberCard({
       </p>
 
       <div className="w-full inline-flex flex-nowrap justify-center gap-[1.25rem]">
-        {members.map((m) => (
-          <MemberItem
-            key={m.id}
-            member={m} // ✅ email 포함된 MemberLite 공유
-            selected={selectedId === m.id}
-            onClick={() => handleSelect(m.id)}
-            maskName
-          />
-        ))}
+        {members.map((m) => {
+          const id = makeStableId(m);
+          return (
+            <MemberItem
+              key={id}
+              member={m} // ✅ 서버 스키마 그대로 전달
+              selected={selectedId === id}
+              onClick={() => handleSelect(id)}
+              maskName
+            />
+          );
+        })}
       </div>
     </div>
   );

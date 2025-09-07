@@ -89,7 +89,11 @@ const ChatLayout = () => {
     <div className="flex flex-col relative w-full min-h-screen bg-background overflow-hidden">
       <div className="flex-1 overflow-y-auto pb-[80px]">
         {showMap ? (
-          <MapView roomId={parsedRoomId} onClose={() => setShowMap(false)} />
+          <MapView
+            roomId={parsedRoomId}
+            onClose={() => setShowMap(false)}
+            myEmail={myEmail}
+          />
         ) : (
           <Outlet context={contextValue} />
         )}
