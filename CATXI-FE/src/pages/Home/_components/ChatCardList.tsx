@@ -29,9 +29,11 @@ const ChatCardList = ({
     page,
   });
 
+  const myRoomId = data?.data?.myRoomId ?? null;
+
   const futureRooms = useMemo(() => {
     const now = Date.now();
-    return (data?.data?.content || []).filter((room: ChatRoomItem) => {
+    return (data?.data?.rooms.content || []).filter((room: ChatRoomItem) => {
       const departTime = new Date(room.departAt).getTime();
       return departTime > now;
     });
@@ -42,9 +44,9 @@ const ChatCardList = ({
     setRetryCount(nextCount);
 
     if (nextCount < 4) {
-      window.location.reload(); 
+      window.location.reload();
     } else {
-      navigate('/');
+      navigate("/");
     }
   };
 
@@ -62,7 +64,7 @@ const ChatCardList = ({
       <div className="flex justify-center items-center h-[60vh]">
         <div className="flex flex-col items-center gap-2">
           <div className="w-8 h-8 border-4 border-[#8C46F6] border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm text-gray-600">로딩 중입니다...</p>
+          <p className="text-sm text-gray-600">로딩 중입니다...</p>
         </div>
       </div>
     );
@@ -85,12 +87,6 @@ const ChatCardList = ({
     );
   }
 
-  const chatRooms = (data?.data?.content || []).filter((room: ChatRoomItem) => {
-    const departTime = new Date(room.departAt).getTime(); 
-    const now = Date.now();
-    return departTime > now;
-  });
-
   if (!futureRooms.length) {
     return (
       <div className="flex justify-center items-center p-4 h-[70vh] custom-scrollbar">
@@ -105,8 +101,8 @@ const ChatCardList = ({
 
   return (
     <div className="mt-4 flex flex-col gap-4 custom-scrollbar">
-      {chatRooms.map((room: ChatRoomItem) => (
-        <ChatCard key={room.roomId} data={room} />
+      {futureRooms.map((room: ChatRoomItem) => (
+        <ChatCard key={room.roomId} data={room} myRoomId={myRoomId} />
       ))}
     </div>
   );

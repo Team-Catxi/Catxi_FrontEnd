@@ -1,29 +1,41 @@
-import type { ChatRoomStatus } from "../../../types/chat/chatData";
-
 interface Props {
-  status?: ChatRoomStatus;
   onClick?: () => void;
+  myRoomId?: number | null;  
+  roomId: number;         
 }
 
-const ChatJoinButton = ({ status, onClick }: Props) => {
-  const isJoinable = status === "WAITING" || status === undefined;
-  const isDisabled = !isJoinable;
+const ChatJoinButton = ({ onClick, myRoomId, roomId }: Props) => {
+  if (!myRoomId) {
+    return (
+      <button
+        onClick={onClick}
+        className="py-[0.65rem] px-[2rem] rounded-[6px] text-[14px] 
+                   bg-[#7424F5] text-white hover:bg-[#5b1fd1] transition"
+      >
+        채팅 참여하기
+      </button>
+    );
+  }
 
-  const displayText = isJoinable
-    ? "채팅 참여하기"
-    : "다른 채팅 참여중";
+  if (myRoomId === roomId) {
+    return (
+      <button
+        disabled
+        className="py-[0.65rem] px-[2rem] rounded-[6px] text-[14px] 
+                   bg-[#424242]/70 text-white cursor-not-allowed"
+      >
+        현재 참여중
+      </button>
+    );
+  }
 
   return (
     <button
-      disabled={isDisabled}
-      onClick={onClick}
-      className={`py-[0.65rem] px-[2rem] rounded-[6px] text-[14px] ${
-        isDisabled
-          ? "bg-[#E0E0E0] text-white cursor-not-allowed"
-          : "bg-[#7424F5] text-white"
-      }`}
+      disabled
+      className="py-[0.65rem] px-[2rem] rounded-[6px] text-[14px] 
+                 bg-[#E0E0E0] text-white cursor-not-allowed"
     >
-      {displayText}
+      다른 채팅 참여중
     </button>
   );
 };
