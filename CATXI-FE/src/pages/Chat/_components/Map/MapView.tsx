@@ -5,6 +5,7 @@ import LocationLayer from "./_components/LocationLayer";
 import { useMapGet } from "../../../../hooks/query/useMapGet";
 import type { ApiMember } from "../../../../types/chat/members";
 import { useTabBar } from "../../../../contexts/TabBarContext";
+import DepartureMarker from "./_components/DepartureMarker";
 
 interface MapViewProps {
   onClose: () => void;
@@ -76,6 +77,9 @@ const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
             </div>
           )}
         </div>
+
+        {/* 클릭시 출발지로 위치 세팅*/}
+        <DepartureMarker onClick={() => alert("출발지 클릭됨")} />
 
         {/* 지도 위 마커: 서버 좌표 기반 */}
         <LocationLayer
