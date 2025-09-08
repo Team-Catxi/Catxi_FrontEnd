@@ -35,11 +35,15 @@ const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
   }, [data]);
 
   const departureKey = useMemo<DepartureKey | null>(() => {
-    const d = data?.data?.departure; // 예: "BUCHEON_ST"
+    const d = data?.data?.departure;
     return typeof d === "string" && d in locationCoordinatesMap
       ? (d as DepartureKey)
       : null;
   }, [data]);
+
+  const departureCoords = useMemo(() => {
+    return departureKey ? locationCoordinatesMap[departureKey] : null;
+  }, [departureKey]);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -50,6 +54,7 @@ const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
     };
   }, [setHidden]);
 
+  // 아이콘 클릭시 선택 : 좌표 콘솔 출력
   useEffect(() => {
     if (
       selectedId !== null &&
@@ -65,7 +70,7 @@ const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
     <div className="absolute inset-0">
       {/* 지도는 풀스크린 배경 */}
       <div className="absolute inset-0 z-0">
-        <Map />
+        <Map initialCenter={departureCoords} level={3} />
       </div>
 
       <div className="absolute inset-0 z-10 pointer-events-none">
