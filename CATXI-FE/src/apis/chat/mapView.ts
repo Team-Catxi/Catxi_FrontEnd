@@ -5,7 +5,7 @@ export const GetMembers = async (
   roomId: number
 ): Promise<GetMembersResponse> => {
   const { data } = await axiosInstance.get<GetMembersResponse>(
-    `map/${roomId}/coordinates`
+    `api/map/${roomId}/coordinates`
   );
   return data;
 };

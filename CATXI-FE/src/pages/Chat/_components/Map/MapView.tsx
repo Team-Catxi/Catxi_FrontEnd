@@ -18,6 +18,10 @@ const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
   const { data, isLoading, isError, error } = useMapGet(roomId);
   const { setHidden } = useTabBar();
 
+  console.log(" roomId:", roomId);
+  console.log(" myEmail:", myEmail);
+  console.log("Map data  1:", data);
+
   const members = useMemo<ApiMember[]>(() => {
     return data?.data?.coordinates ?? [];
   }, [data]);
@@ -25,9 +29,9 @@ const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
-    setHidden(true); 
+    setHidden(true);
     return () => {
-      setHidden(false); 
+      setHidden(false);
     };
   }, [setHidden]);
 
@@ -91,7 +95,6 @@ const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
           />
         </div>
       </div>
-
     </div>
   );
 };
