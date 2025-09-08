@@ -6,6 +6,9 @@ import { useMapGet } from "../../../../hooks/query/useMapGet";
 import type { ApiMember } from "../../../../types/chat/members";
 import { useTabBar } from "../../../../contexts/TabBarContext";
 import DepartureMarker from "./_components/DepartureMarker";
+import { locationCoordinatesMap } from "../../../../constants/coordinates";
+
+type DepartureKey = keyof typeof locationCoordinatesMap;
 
 interface MapViewProps {
   onClose: () => void;
@@ -17,6 +20,10 @@ const makeStableId = (m: ApiMember) => `${m.roomId}:${m.email}`;
 
 const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
   const { data, isLoading, isError, error } = useMapGet(roomId);
+  console.log(isLoading);
+  console.log(isError);
+  console.log(error);
+
   const { setHidden } = useTabBar();
 
   console.log(" roomId:", roomId);
@@ -25,6 +32,13 @@ const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
 
   const members = useMemo<ApiMember[]>(() => {
     return data?.data?.coordinates ?? [];
+  }, [data]);
+
+  const departureKey = useMemo<DepartureKey | null>(() => {
+    const d = data?.data?.departure; // 예: "BUCHEON_ST"
+    return typeof d === "string" && d in locationCoordinatesMap
+      ? (d as DepartureKey)
+      : null;
   }, [data]);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -56,11 +70,7 @@ const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
 
       <div className="absolute inset-0 z-10 pointer-events-none">
         {/* 상단 UI */}
-        <div className="flex flex-col items-center gap-4 p-4 pointer-events-auto">
-          <p className="text-gray-700 text-lg font-medium">
-            현재 Room ID: {roomId}
-          </p>
-
+        <div className="absolute top-5 left-0 right-0 flex justify-between items-center px-[1.5rem] ">
           <button
             onClick={onClose}
             className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
@@ -68,18 +78,9 @@ const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
             임시 닫기
           </button>
 
-          {isLoading && (
-            <div className="text-sm text-gray-500">지도 멤버 로딩 중…</div>
-          )}
-          {isError && (
-            <div className="text-sm text-red-600">
-              로드 실패: {String(error?.message ?? "네트워크 오류")}
-            </div>
-          )}
+          {/* 클릭시 출발지로 위치 세팅*/}
+          <DepartureMarker departureKey={departureKey} />
         </div>
-
-        {/* 클릭시 출발지로 위치 세팅*/}
-        <DepartureMarker onClick={() => alert("출발지 클릭됨")} />
 
         {/* 지도 위 마커: 서버 좌표 기반 */}
         <LocationLayer
