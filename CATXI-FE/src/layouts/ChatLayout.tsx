@@ -6,6 +6,7 @@ import Logo from "../assets/icons/CatxiLogo.svg?react";
 import { useNavigationBlocker } from "../hooks/navigation/useNavigationBlocker";
 import { useChatConnection } from "../hooks/chatConnect/useChatConnection";
 import MapView from "../pages/Chat/_components/Map/MapView";
+import { useChatRoomActivity } from "../hooks/active/useChatRoomActivity";
 
 const ChatLayout = () => {
   const navigate = useNavigate();
@@ -28,6 +29,11 @@ const ChatLayout = () => {
   } = useChatConnection(parsedRoomId);
 
   useNavigationBlocker();
+
+  useChatRoomActivity({
+    roomId: parsedRoomId,
+    inactiveThreshold: 30000, 
+  });
 
   const handleSubmit = () => {
     if (!input.trim()) return;
