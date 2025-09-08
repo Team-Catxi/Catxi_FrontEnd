@@ -1,7 +1,21 @@
 import { useEffect, useRef } from "react";
 import { loadKakaoMap } from "../../../../../apis/kakaoMap/useKakaoLoader";
 
-export const Map = () => {
+type LatLng = { latitude: number; longitude: number };
+
+declare global {
+  interface Window {
+    __kakao?: any;
+    __kakaoMap?: any;
+  }
+}
+
+interface MapProps {
+  initialCenter?: LatLng | null;
+  level?: number;
+}
+
+export const Map = ({ initialCenter, level = 3 }: MapProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<any>(null);
 
@@ -12,11 +26,17 @@ export const Map = () => {
       .then((kakao) => {
         if (!mounted || !containerRef.current || mapRef.current) return;
 
-        const center = new kakao.maps.LatLng(33.450701, 126.570667);
+        const centerLat = initialCenter?.latitude ?? 37.5665;
+        const centerLng = initialCenter?.longitude ?? 126.978;
+
+        const center = new kakao.maps.LatLng(centerLat, centerLng);
         mapRef.current = new kakao.maps.Map(containerRef.current, {
           center,
-          level: 3,
+          level,
         });
+
+        window.__kakao = kakao;
+        window.__kakaoMap = mapRef.current;
       })
       .catch((err) => {
         console.error("Kakao Map load failed:", err);
@@ -26,6 +46,18 @@ export const Map = () => {
       mounted = false;
     };
   }, []);
-  //색상은 테스트용 완료되면 삭제할 것
+
+  useEffect(() => {
+    const kakao = window.__kakao;
+    const map = window.__kakaoMap;
+    if (!kakao || !map || !initialCenter) return;
+
+    const pos = new kakao.maps.LatLng(
+      initialCenter.latitude,
+      initialCenter.longitude
+    );
+    map.setCenter(pos);
+  }, [initialCenter]);
+
   return <div ref={containerRef} className="w-full h-full bg-amber-300" />;
 };

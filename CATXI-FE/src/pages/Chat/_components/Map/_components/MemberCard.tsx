@@ -16,8 +16,21 @@ export default function MemberCard({
   onSelect,
   className = "",
 }: MemberCardProps) {
-  const handleSelect = (id: string) => {
+  // 클릭 시: 선택 토글 + 위도/경도 콘솔 출력
+  const handleClick = (member: ApiMember) => {
+    const id = makeStableId(member);
     onSelect(selectedId === id ? null : id);
+
+    const { latitude, longitude, name, email } = member;
+    if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+      console.log(
+        "클릭한 멤버 좌표:",
+        { name, email },
+        { latitude, longitude }
+      );
+    } else {
+      console.log("좌표 없음:", { name, email, latitude, longitude });
+    }
   };
 
   return (
@@ -37,7 +50,7 @@ export default function MemberCard({
               key={id}
               member={m}
               selected={selectedId === id}
-              onClick={() => handleSelect(id)}
+              onClick={() => handleClick(m)}
               maskName
             />
           );
