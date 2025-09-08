@@ -8,7 +8,6 @@ interface MemberCardProps {
   className?: string;
 }
 
-// 안정 키 생성기: roomId + email
 const makeStableId = (m: ApiMember) => `${m.roomId}:${m.email}`;
 
 export default function MemberCard({
@@ -36,7 +35,7 @@ export default function MemberCard({
           return (
             <MemberItem
               key={id}
-              member={m} // ✅ 서버 스키마 그대로 전달
+              member={m}
               selected={selectedId === id}
               onClick={() => handleSelect(id)}
               maskName
