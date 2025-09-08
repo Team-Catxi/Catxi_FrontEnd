@@ -42,7 +42,6 @@ const ChatItem = ({
   const { handleReport, handleKick, openModal } = useChatActions(
     Number(roomId),
     senderEmail,
-    myEmail
   );
 
   const handleNameClick = () => {

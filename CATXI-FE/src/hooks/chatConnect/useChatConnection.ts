@@ -61,7 +61,10 @@ export function useChatConnection(roomId: number) {
   }, [chatHistory, email, setMessages]);
 
   const handleParticipantsMessage = (raw: any) => {
-    const updatedCount = raw.participantNicknames?.length ?? 0;
+    const participants = raw.participants ?? [];
+
+    const emails = participants.map((p: any) => p.email);
+    const nicknames = participants.map((p: any) => p.nickname);
 
     queryClient.setQueryData(['chatRoomDetail', roomId], (prev: any) => {
       if (!prev) return prev;
@@ -69,8 +72,9 @@ export function useChatConnection(roomId: number) {
         ...prev,
         data: {
           ...prev.data,
-          currentSize: updatedCount,
-          participantNicknames: raw.participantNicknames, 
+          currentSize: participants.length,
+          participantEmails: emails,
+          participantNicknames: nicknames,
         },
       };
     });

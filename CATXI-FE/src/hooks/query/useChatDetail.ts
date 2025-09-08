@@ -6,5 +6,9 @@ export const useChatRoomDetail = (roomId: number) => {
     queryKey: ['chatRoomDetail', roomId],
     queryFn: () => fetchChatRoomDetail(roomId),
     enabled: !!roomId,
+    refetchOnWindowFocus: false,   
+    refetchOnReconnect: false,    
+    retry: false,                 
   });
 };
+
