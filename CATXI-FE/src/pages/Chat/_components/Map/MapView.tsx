@@ -20,7 +20,7 @@ const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
 
   console.log(" roomId:", roomId);
   console.log(" myEmail:", myEmail);
-  console.log("Map data:", data);
+  console.log("Map data  1:", data);
 
   const members = useMemo<ApiMember[]>(() => {
     return data?.data?.coordinates ?? [];
