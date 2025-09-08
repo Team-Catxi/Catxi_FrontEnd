@@ -1,5 +1,6 @@
 import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { initializeMessaging } from "./config/firebase"; 
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -16,6 +17,7 @@ import HomePage from "./pages/Home";
 import { AuthCheck } from "./utils/authCheck";
 import GlobalErrorPage from "./layouts/GlobalErrorPage";
 import TestPage from "./pages/TestPage";
+import { useEffect } from "react";
 
 const publicRoutes = createBrowserRouter([
   {
@@ -69,6 +71,10 @@ export const queryClient = new QueryClient({
 });
 
 const App = () => {
+  useEffect(() => {
+    initializeMessaging();
+  }, []);
+  
   return (
     <QueryClientProvider client={queryClient}>
       <div className="w-full bg-background min-h-screen font-pretendard">
