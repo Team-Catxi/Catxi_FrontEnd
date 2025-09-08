@@ -26,6 +26,6 @@ export const Map = () => {
       mounted = false;
     };
   }, []);
-
+  //색상은 테스트용 완료되면 삭제할 것
   return <div ref={containerRef} className="w-full h-full bg-amber-300" />;
 };
