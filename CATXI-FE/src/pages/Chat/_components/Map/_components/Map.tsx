@@ -1,25 +1,30 @@
 import { useEffect, useRef } from "react";
-
-declare global {
-  interface Window {
-    kakao: any;
-  }
-}
+import { loadKakaoMap } from "../../../../../apis/kakaoMap/useKakaoLoader";
 
 export const Map = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<any>(null); // 중복 초기화 방지
+  const mapRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!window.kakao) return;
-    window.kakao.maps.load(() => {
-      if (!containerRef.current || mapRef.current) return;
-      const center = new window.kakao.maps.LatLng(33.450701, 126.570667);
-      mapRef.current = new window.kakao.maps.Map(containerRef.current, {
-        center,
-        level: 3,
+    let mounted = true;
+
+    loadKakaoMap()
+      .then((kakao) => {
+        if (!mounted || !containerRef.current || mapRef.current) return;
+
+        const center = new kakao.maps.LatLng(33.450701, 126.570667);
+        mapRef.current = new kakao.maps.Map(containerRef.current, {
+          center,
+          level: 3,
+        });
+      })
+      .catch((err) => {
+        console.error("Kakao Map load failed:", err);
       });
-    });
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return <div ref={containerRef} className="w-full h-full bg-amber-300" />;
