@@ -1,10 +1,17 @@
 import RecordCard from "./_components/RecordCard";
 import { useGetHistory, useGetMyPage } from "../../hooks/query/useMyPage";
+import { useModal } from "../../contexts/ModalContext";
+import { useLogout } from "../../hooks/mutation/logout/useLogout";
 import { useDeleteUser } from "../../hooks/useDeleteUser";
 import { useEffect, useRef } from "react";
+import DeleteUserConfirmModal from "./_components/DeleteUserConfirmModal";
+import LogoutConfirmModal from "./_components/LogoutConfirmModal";
+
 const MyPage = () => {
   const { data } = useGetMyPage();
   const { deleteUser } = useDeleteUser();
+  const { mutate: logout } = useLogout();
+  const { openModal } = useModal();
   const {
     data: historyData,
     fetchNextPage,
@@ -12,15 +19,19 @@ const MyPage = () => {
     isFetchingNextPage,
   } = useGetHistory();
 
+
   const allHistory = historyData?.pages.flatMap((page) => page.content) ?? [];
 
   const { membername, studentNo, matchCount } = data?.data || {};
-  const handleDeleteUser = async () => {
-    const isConfirmed = window.confirm("회원 탈퇴를 진행하시겠습니까?");
-    if (isConfirmed) {
-      deleteUser();
-    }
+
+  const handleLogout = () => {
+    openModal(<LogoutConfirmModal onConfirm={() => logout()} />);
   };
+
+  const handleDeleteUser = async () => {
+    openModal(<DeleteUserConfirmModal onConfirm={() => deleteUser()} />);
+  };
+
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -54,12 +65,21 @@ const MyPage = () => {
             <p className="text-[22px] font-medium text-[#424242]">
               {membername} 님
             </p>
-            <p
-              className="text-xs font-normal text-[#9E9E9E] cursor-pointer"
-              onClick={() => handleDeleteUser()}
-            >
-              회원 탈퇴하기
-            </p>
+            <div className="flex items-center gap-3 text-xs">
+              <p
+                className="font-normal text-black cursor-pointer"
+                onClick={handleLogout}
+              >
+                로그아웃
+              </p>
+              <span className="text-[#9E9E9E]">|</span>
+              <p
+                className="font-normal text-[#9E9E9E] cursor-pointer"
+                onClick={handleDeleteUser}
+              >
+                회원 탈퇴하기
+              </p>
+            </div>
           </div>
           <div className="bg-[#FEFEFE] w-full h-17.25 rounded-[10px] p-3.75 flex justify-center items-center gap-10">
             <div className="flex flex-col gap-2 justify-center items-center">
@@ -79,7 +99,6 @@ const MyPage = () => {
         </div>
         <div className="flex flex-col gap-5">
           <p className="text-lg font-medium text-[#424242]">내 이용 기록</p>
-
           {allHistory.length === 0 ? (
             <div className="text-sm text-[#9E9E9E] text-center py-10">
               아직 이용한 채팅방 기록이 없어요
@@ -104,4 +123,5 @@ const MyPage = () => {
     </div>
   );
 };
+
 export default MyPage;
