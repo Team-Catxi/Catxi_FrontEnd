@@ -75,7 +75,10 @@ const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
 
       <div className="absolute inset-0 z-10 pointer-events-none">
         {/* 상단 UI */}
-        <div className="absolute top-5 left-0 right-0 flex justify-between items-center px-[1.5rem] ">
+        <div
+          aria-label="헤더"
+          className="absolute top-5 left-0 right-0 flex justify-between items-center px-[1.5rem] z-30 "
+        >
           <button
             onClick={onClose}
             className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
