@@ -11,7 +11,7 @@ import { useChatRoomActivity } from "../hooks/active/useChatRoomActivity";
 const ChatLayout = () => {
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const parsedRoomId = Number(roomId);
+  const parsedRoomId = Number(roomId ?? 0); 
   const [input, setInput] = useState("");
   const [showMap, setShowMap] = useState(false);
 
@@ -19,6 +19,8 @@ const ChatLayout = () => {
     messages,
     myEmail,
     sendMessage,
+    sendCoordinate,  
+    status,          
     nicknameMap,
     hostEmail,
     hostNickname,
@@ -44,10 +46,10 @@ const ChatLayout = () => {
   const contextValue = useMemo(
     () => ({
       messages,
-      myEmail,
-      hostEmail,
-      hostNickname,
-      chatRoom: chatRoomDetail,
+      myEmail: myEmail || "",
+      hostEmail: hostEmail || "",
+      hostNickname: hostNickname || "",
+      chatRoom: chatRoomDetail ?? null,
       nicknameMap,
       refetchChatRoomDetail,
       setShowMap,
@@ -98,7 +100,9 @@ const ChatLayout = () => {
           <MapView
             roomId={parsedRoomId}
             onClose={() => setShowMap(false)}
-            myEmail={myEmail}
+            myEmail={myEmail || ""}
+            sendCoordinate={sendCoordinate}   
+            status={status}                  
           />
         ) : (
           <Outlet context={contextValue} />
