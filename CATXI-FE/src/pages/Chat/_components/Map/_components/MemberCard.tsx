@@ -16,7 +16,6 @@ export default function MemberCard({
   onSelect,
   className = "",
 }: MemberCardProps) {
-  // 클릭 시: 선택 토글 + 위도/경도 콘솔 출력
   const handleClick = (member: ApiMember) => {
     const id = makeStableId(member);
     onSelect(selectedId === id ? null : id);
@@ -43,18 +42,19 @@ export default function MemberCard({
       </p>
 
       <div className="w-full inline-flex flex-nowrap justify-center gap-[1.25rem]">
-        {members.map((m) => {
-          const id = makeStableId(m);
-          return (
-            <MemberItem
-              key={id}
-              member={m}
-              selected={selectedId === id}
-              onClick={() => handleClick(m)}
-              maskName
-            />
-          );
-        })}
+        {Array.isArray(members) &&
+          members.map((m) => {
+            const id = makeStableId(m);
+            return (
+              <MemberItem
+                key={id}
+                member={m}
+                selected={selectedId === id}
+                onClick={() => handleClick(m)}
+                maskName={true} 
+              />
+            );
+          })}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
-import MemberLocation from "../../../../../assets/icons/MemberLocation.svg";
-import YourLocation from "../../../../../assets/icons/YourLocation.svg";
-import ClickMemberLocation from "../../../../../assets/icons/ClickLocation.svg";
+import MemberLocation from "../../../../../assets/icons/MemberLocation.svg?react";
+import YourLocation from "../../../../../assets/icons/YourLocation.svg?react";
+import ClickMemberLocation from "../../../../../assets/icons/ClickLocation.svg?react";
 
 interface LocationItemProps {
   name: string;
@@ -28,12 +28,6 @@ const LocationItem = ({
 }: LocationItemProps) => {
   const self = myEmail && email ? myEmail === email : false;
 
-  const iconSrc = selected
-    ? (ClickMemberLocation as unknown as string)
-    : self
-    ? (YourLocation as unknown as string)
-    : (MemberLocation as unknown as string);
-
   const nameColor = selected
     ? "text-violet-600"
     : self
@@ -51,6 +45,7 @@ const LocationItem = ({
       className={`cursor-pointer select-none flex flex-col items-center -translate-x-1/2 -translate-y-full ${className}`}
       aria-selected={selected}
     >
+      {/* 이름 */}
       <div
         className={`mb-1 text-sm font-semibold ${nameColor} max-w-[6ch] truncate text-center`}
         title={displayName}
@@ -58,13 +53,14 @@ const LocationItem = ({
         {displayName}
       </div>
 
-      <img
-        src={iconSrc}
-        alt={selected ? "선택한 사용자 위치" : self ? "내 위치" : "멤버 위치"}
-        className="w-[72px] h-[72px] pointer-events-none"
-        draggable={false}
-        onDragStart={(e) => e.preventDefault()}
-      />
+      {/* 아이콘 조건부 렌더링 */}
+      {selected ? (
+        <ClickMemberLocation className="w-[72px] h-[72px] pointer-events-none select-none" />
+      ) : self ? (
+        <YourLocation className="w-[72px] h-[72px] pointer-events-none select-none" />
+      ) : (
+        <MemberLocation className="w-[72px] h-[72px] pointer-events-none select-none" />
+      )}
     </div>
   );
 };

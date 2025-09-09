@@ -29,7 +29,6 @@ export default function LocationLayer({
 }: LocationLayerProps) {
   const overlaysRef = useRef<Map<string, OverlayEntry>>(new Map());
 
-  // 멤버 배열/선택 상태 변화에 따라 오버레이 생성/업데이트/삭제
   useEffect(() => {
     const kakao = window.__kakao;
     const map = window.__kakaoMap;
@@ -37,13 +36,21 @@ export default function LocationLayer({
 
     const existing = overlaysRef.current;
 
-    // 1) 유효 좌표만 대상
     const validMembers = members.filter(
-      (m) => Number.isFinite(m.latitude) && Number.isFinite(m.longitude)
+      (m) =>
+        m &&
+        typeof m.email === "string" &&
+        m.email.trim() !== "" &&
+        typeof m.name === "string" &&
+        m.name.trim() !== "" &&
+        typeof m.latitude === "number" &&
+        typeof m.longitude === "number" &&
+        Number.isFinite(m.latitude) &&
+        Number.isFinite(m.longitude)
     );
+
     const nextIds = new Set(validMembers.map(makeStableId));
 
-    // 2) 사라진 멤버 오버레이 제거
     existing.forEach((entry, id) => {
       if (!nextIds.has(id)) {
         entry.root.unmount();
@@ -52,27 +59,26 @@ export default function LocationLayer({
       }
     });
 
-    // 3) 새/변경 멤버 오버레이 생성/업데이트
     validMembers.forEach((m) => {
       const id = makeStableId(m);
-      const pos = new kakao.maps.LatLng(m.latitude, m.longitude);
+      const pos = new kakao.maps.LatLng(m.latitude!, m.longitude!);
       const isSelected = selectedId === id;
 
       const renderItem = (root: Root) => {
         root.render(
           <LocationItem
-            name={m.name}
-            email={m.email}
-            myEmail={myEmail || ""}
+            name={m.name ?? "이름없음"}
+            email={m.email ?? ""}
+            myEmail={myEmail ?? ""}
             selected={isSelected}
             onClick={() => {
               const next = isSelected ? null : id;
               onSelect(next);
 
-              // 클릭 시 포커스 이동
-              window.__kakaoMap?.panTo(pos);
+              if (window.__kakaoMap) {
+                window.__kakaoMap.panTo(pos);
+              }
 
-              // 디버그 로그
               console.log("멤버 좌표:", {
                 name: m.name,
                 email: m.email,

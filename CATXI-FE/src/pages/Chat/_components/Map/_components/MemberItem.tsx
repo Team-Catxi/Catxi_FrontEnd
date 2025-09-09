@@ -1,5 +1,5 @@
-import ClickMember from "../../../../../assets/icons/ClickMember.svg";
-import Member from "../../../../../assets/icons/Member.svg";
+import ClickMember from "../../../../../assets/icons/ClickMember.svg?react";
+import Member from "../../../../../assets/icons/Member.svg?react";
 
 interface MemberLite {
   roomId: number;
@@ -33,7 +33,9 @@ export default function MemberItem({
   maskName = true,
 }: MemberItemProps) {
   const name = maskName ? mask(member.name) : member.name;
-  const km = Math.round(member.distance);
+  const km = Number.isFinite(member.distance)
+    ? Math.round(member.distance)
+    : 0;
   const isDimmed = member.active === false && !selected;
 
   return (
@@ -47,20 +49,14 @@ export default function MemberItem({
     >
       {/* 아이콘 */}
       <div className="w-[4rem] h-[4rem] flex items-center justify-center transition-all">
-        <img
-          src={
-            selected
-              ? (ClickMember as unknown as string)
-              : (Member as unknown as string)
-          }
-          alt={name}
-          className="w-[3.75rem] h-[3.75rem] select-none"
-          draggable={false}
-          onDragStart={(e) => e.preventDefault()}
-        />
+        {selected ? (
+          <ClickMember className="w-[3.75rem] h-[3.75rem] select-none" />
+        ) : (
+          <Member className="w-[3.75rem] h-[3.75rem] select-none" />
+        )}
       </div>
 
-      {/* 이름 (3글자 초과 ... 처리) */}
+      {/* 이름 */}
       <div
         className={`text-[13px] font-medium ${
           selected ? "text-violet-600" : "text-gray-500"
