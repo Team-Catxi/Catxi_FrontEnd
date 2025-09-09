@@ -35,3 +35,4 @@ const DeleteUserConfirmModal = ({ onConfirm }: Props) => {
 };
 
 export default DeleteUserConfirmModal;
+
