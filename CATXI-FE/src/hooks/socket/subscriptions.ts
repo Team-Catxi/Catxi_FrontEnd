@@ -6,6 +6,7 @@ import {
   participantsTopic,
   deletedTopic,
   mapTopic, 
+  resultTopic,
 } from "./topics.ts";
 
 export interface SubRefs {
@@ -15,6 +16,7 @@ export interface SubRefs {
   participants: Subscription | null;
   deleted: Subscription | null;
   map: Subscription | null;
+  result: Subscription | null;
 }
 
 export const cleanupSubscriptions = (refs: SubRefs) => {
@@ -24,6 +26,7 @@ export const cleanupSubscriptions = (refs: SubRefs) => {
   refs.participants?.unsubscribe();
   refs.deleted?.unsubscribe();
   refs.map?.unsubscribe();
+  refs.result?.unsubscribe(); 
 
   refs.chat = null;
   refs.ready = null;
@@ -31,6 +34,7 @@ export const cleanupSubscriptions = (refs: SubRefs) => {
   refs.participants = null;
   refs.deleted = null;
   refs.map = null; 
+  refs.result = null;
 };
 
 export const setupSubscriptions = (
@@ -43,7 +47,8 @@ export const setupSubscriptions = (
     system?: (data: any) => void;
     participants?: (data: any) => void;
     deleted?: (data: any) => void;
-    map?: (data: any) => void; 
+    map?: (data: any) => void;
+    result?: (data: any) => void;  
   }
 ): SubRefs => {
   return {
@@ -75,5 +80,11 @@ export const setupSubscriptions = (
           Authorization: `Bearer ${jwtToken}`,
         })
       : null, 
+
+    result: handlers.result
+      ? client.subscribe(resultTopic(roomId), (msg) => handlers.result!(JSON.parse(msg.body)), {
+          Authorization: `Bearer ${jwtToken}`,
+        })
+      : null,
   };
 };
