@@ -10,7 +10,8 @@ import { useChatMessagesHandler } from './useChatMessagesHandler';
 import { useReady } from './useReady';
 import { buildChatPayload } from '../socket/payloadBuilder';
 import { parseChatMessage, parseReadyMessage } from '../../utils/chat/parseSocketMessages';
-import { queryClient } from '../../App'; 
+import { useParticipantsHandler } from './handlers/useParticipantsHandler';
+import { useResultHandler } from './handlers/useResultHandlers';
 
 export function useChatConnection(roomId: number) {
   const email = useUserEmail();
@@ -60,33 +61,18 @@ export function useChatConnection(roomId: number) {
     }
   }, [chatHistory, email, setMessages]);
 
-  const handleParticipantsMessage = (raw: any) => {
-    const participants = raw.participants ?? [];
-
-    const emails = participants.map((p: any) => p.email);
-    const nicknames = participants.map((p: any) => p.nickname);
-
-    queryClient.setQueryData(['chatRoomDetail', roomId], (prev: any) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        data: {
-          ...prev.data,
-          currentSize: participants.length,
-          participantEmails: emails,
-          participantNicknames: nicknames,
-        },
-      };
-    });
-  };
+  const handleParticipantsMessage = useParticipantsHandler(roomId);
+  const handleResultMessage = useResultHandler(roomId, handleMessage);
 
   const { connect, disconnect, sendMessage, status } = useChatSocket(
     roomId,
     Storage.getAccessToken()!,
-    (raw) => handleMessage(parseChatMessage(raw, email ?? '', nicknameMap)),
-    (raw) => handleReadyMessage(parseReadyMessage(raw)), 
-    undefined, 
-    (raw) => handleParticipantsMessage(raw), 
+    (raw) => handleMessage(parseChatMessage(raw, email ?? '', nicknameMap)),  // chat
+    (raw) => handleReadyMessage(parseReadyMessage(raw)),                      // ready
+    undefined,                                                                // system
+    (raw) => handleParticipantsMessage(raw),                                  // participants
+    undefined,                                                                // map
+    (raw) => handleResultMessage(raw),                                        // result
   );
 
   useEffect(() => {

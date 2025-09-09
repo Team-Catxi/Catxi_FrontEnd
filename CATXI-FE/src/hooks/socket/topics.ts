@@ -7,3 +7,5 @@ export const participantsTopic = (roomId: number) =>
 export const deletedTopic = (roomId: number) => `/topic/room/${roomId}/deleted`;
 export const mapTopic = (roomId: number) => `/topic/map/${roomId}`;
 export const mapPublish = (roomId: number) => `/publish/map/${roomId}`;
+export const resultTopic = (roomId: number) =>
+  `/topic/ready/${roomId}/result`;

@@ -18,7 +18,8 @@ export function useChatSocket(
   onReadyMessage?: (raw: any) => void,
   onSystemMessage?: (raw: any) => void,
   onParticipantsMessage?: (raw: any) => void,
-  onMapMessage?: (raw: any) => void
+  onMapMessage?: (raw: any) => void,
+  onResultMessage?: (raw: any) => void
 ) {
   const stompClientRef = useRef<Client | null>(null);
   const subRefs = useRef<SubRefs>({
@@ -28,6 +29,7 @@ export function useChatSocket(
     participants: null,
     deleted: null,
     map: null,
+    result: null,
   });
 
   const [status, setStatus] = useState<ConnectionStatus>("idle");
@@ -37,6 +39,7 @@ export function useChatSocket(
   const systemHandlerRef = useRef(onSystemMessage);
   const participantsHandlerRef = useRef(onParticipantsMessage);
   const mapHandlerRef = useRef(onMapMessage);
+  const resultHandlerRef = useRef(onResultMessage);
 
   const navigate = useNavigate();
 
@@ -46,12 +49,14 @@ export function useChatSocket(
     systemHandlerRef.current = onSystemMessage;
     participantsHandlerRef.current = onParticipantsMessage;
     mapHandlerRef.current = onMapMessage;
+    resultHandlerRef.current = onResultMessage;
   }, [
     onChatMessage,
     onReadyMessage,
     onSystemMessage,
     onParticipantsMessage,
     onMapMessage,
+    onResultMessage, 
   ]);
 
   const connect = useCallback(() => {
@@ -83,6 +88,7 @@ export function useChatSocket(
           system: (data) => systemHandlerRef.current?.(data),
           participants: (data) => participantsHandlerRef.current?.(data),
           map: (data) => mapHandlerRef.current?.(data),
+          result: (data) => resultHandlerRef.current?.(data), 
           deleted: () => {
             console.warn("[WebSocket] 방 삭제 이벤트 수신");
             cleanupSubscriptions(subRefs.current);
