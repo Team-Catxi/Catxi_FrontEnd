@@ -1,6 +1,5 @@
 import axios from "axios";
 import Storage from "../utils/storage";
-import { reissueToken } from "../apis/reissue/api"; // 방금 만든 API
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_SERVER_API_URL,
@@ -20,30 +19,21 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    const status = error.response?.status;
-    const data = error.response?.data;
+  (response) => {
+    const refreshed = response.headers["x-access-token-refreshed"];
+    const newToken = response.headers["authorization"]; 
 
-    if (status === 401 || data?.code === "ACCESS401") {
-      originalRequest._retry = true; 
-
-      try {
-        const { data } = await reissueToken();
-        Storage.setAccessToken(data.accessToken);
-
-        originalRequest.headers["Authorization"] = `Bearer ${data.accessToken}`;
-        return axiosInstance(originalRequest);
-      } catch (err) {
-        Storage.clearStorage();
-        window.location.href = "/";
-        return Promise.reject(err);
-      }
+    if (refreshed === "true" && newToken) {
+      const tokenValue = newToken.replace(/Bearer\s+/i, "");
+      Storage.setAccessToken(tokenValue);
     }
 
-    if (status === 403) {
-      console.error("403 Forbidden:", error.response?.data);
+    return response;
+  },
+  (error) => {
+    const status = error.response?.status;
+
+    if (status === 401 || status === 403) {
       Storage.clearStorage();
       window.location.href = "/";
     }
