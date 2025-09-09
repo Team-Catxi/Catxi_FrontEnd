@@ -93,7 +93,7 @@ const MapView = ({ onClose, roomId, myEmail }: MapViewProps) => {
           selectedId={selectedId}
           onSelect={handleSelect}
           myEmail={myEmail}
-          className="absolute inset-0 pointer-events-auto"
+          className="absolute inset-0 pointer-events-auto z-20"
         />
 
         {/* 하단 고정 MemberCard */}

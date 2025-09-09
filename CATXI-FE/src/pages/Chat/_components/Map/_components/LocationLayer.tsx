@@ -85,7 +85,6 @@ export default function LocationLayer({
       };
 
       if (existing.has(id)) {
-        // UPDATE: 위치/선택상태/표시내용 갱신
         const entry = existing.get(id)!;
         entry.overlay.setPosition(pos);
         renderItem(entry.root);
@@ -94,7 +93,6 @@ export default function LocationLayer({
         return;
       }
 
-      // CREATE
       const container = document.createElement("div");
       container.style.pointerEvents = "auto";
       const root = createRoot(container);
@@ -114,7 +112,6 @@ export default function LocationLayer({
     });
   }, [members, selectedId, onSelect, myEmail]);
 
-  // 언마운트 시 정리
   useEffect(() => {
     return () => {
       const existing = overlaysRef.current;
