@@ -44,7 +44,7 @@ const NotificationToggle = () => {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[0.875rem] text-[#424242]">알림 설정</span>
+      <span className="text-[0.875rem] text-[#9E9E9E] font-medium">알림 설정</span>
       <button
         onClick={handleToggle}
         className={`relative w-[3.25rem] h-[1.25rem] rounded-full transition-colors ${
