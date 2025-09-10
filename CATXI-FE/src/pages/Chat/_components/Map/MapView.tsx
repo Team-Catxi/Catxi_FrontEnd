@@ -178,7 +178,7 @@ const MapView = ({
         )}
 
         {/* 하단 멤버 카드 */}
-        <div className="absolute bottom-5 left-0 right-0 px-4 pointer-events-auto">
+        <div className="absolute z-100 bottom-5 left-0 right-0 px-4 pointer-events-auto">
           <MemberCard
             members={members}
             selectedId={selectedId}
