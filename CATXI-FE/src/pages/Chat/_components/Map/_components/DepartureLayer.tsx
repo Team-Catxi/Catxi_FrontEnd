@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { locationCoordinatesMap } from "../../../../../constants/coordinates";
-import departIcon from "../../../../assets/icons/departure.svg";
+import DepartIcon from "../../../../../assets/icons/departIcon.svg?react";
 
 type DepartureKey = keyof typeof locationCoordinatesMap;
 type LatLng = { latitude: number; longitude: number };
@@ -26,7 +26,7 @@ export default function DepartureLayer({
 
   return (
     <div className="pointer-events-auto" onClick={handleClick}>
-      <img src={departIcon} alt="출발지 아이콘" className="w-[3rem] h-[3rem]" />
+      <DepartIcon className="w-[3rem] h-[3rem]" />
     </div>
   );
 }
