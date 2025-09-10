@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { locationCoordinatesMap } from "../../../../../constants/coordinates";
+import LocationIcon from "../../../../assets/icons/location.svg";
 
 type DepartureKey = keyof typeof locationCoordinatesMap;
 type LatLng = { latitude: number; longitude: number };
@@ -30,6 +31,11 @@ export default function DepartureMarker({
       className={`p-[0.5rem] bg-violet-600 rounded-[2rem] items-center gap-[0.25rem] pointer-events-auto ${className}`}
       onClick={handleClick}
     >
+      <img
+        src={LocationIcon}
+        alt="출발지 아이콘"
+        className="w-[1.125rem] h-[1.125rem]"
+      />
       <p className="text-white text-[1rem]">출발지</p>
     </div>
   );
