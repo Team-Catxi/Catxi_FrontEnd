@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { loadKakaoMap } from "../../../../../apis/kakaoMap/useKakaoLoader";
 
 type LatLng = { latitude: number; longitude: number };
@@ -13,11 +13,13 @@ declare global {
 interface MapProps {
   initialCenter?: LatLng | null;
   level?: number;
+  onMapReady?: () => void; // 지도 준비 알림용
 }
 
-export const Map = ({ initialCenter, level = 3 }: MapProps) => {
+export const Map = ({ initialCenter, level = 3, onMapReady }: MapProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<any>(null);
+  const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -37,6 +39,9 @@ export const Map = ({ initialCenter, level = 3 }: MapProps) => {
 
         window.__kakao = kakao;
         window.__kakaoMap = mapRef.current;
+
+        setMapReady(true);
+        onMapReady?.(); // 외부에 알림
       })
       .catch((err) => {
         console.error("Kakao Map load failed:", err);
@@ -44,9 +49,13 @@ export const Map = ({ initialCenter, level = 3 }: MapProps) => {
 
     return () => {
       mounted = false;
+      // cleanup
+      mapRef.current = null;
+      window.__kakaoMap = undefined;
     };
   }, []);
 
+  // 초기 좌표 이동
   useEffect(() => {
     const kakao = window.__kakao;
     const map = window.__kakaoMap;
@@ -57,7 +66,7 @@ export const Map = ({ initialCenter, level = 3 }: MapProps) => {
       initialCenter.longitude
     );
     map.setCenter(pos);
-  }, [initialCenter]);
+  }, [initialCenter, mapReady]); // mapReady가 true일 때만 실행
 
   return <div ref={containerRef} className="w-full h-full bg-amber-300" />;
 };
