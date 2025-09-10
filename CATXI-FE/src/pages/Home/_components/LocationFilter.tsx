@@ -57,7 +57,7 @@ const LocationFilter: React.FC<Props> = ({
         <div className="w-[1px] h-[8px] bg-[#E0E0E0]"></div>
         <span
           className={`text-[14px] cursor-pointer ${
-            sort === "createdTime" ? "text-black font-bold" : "text-[#9E9E9E]"
+            sort === "createdTime" ? "text-black font-medium" : "text-[#9E9E9E]"
           }`}
           onClick={() => onSelectSort("createdTime")}
         >
