@@ -3,17 +3,25 @@ import LoginCheck from "../../assets/icons/loginCheck.svg?react";
 import clsx from "clsx";
 import { useSignin } from "../../hooks/useSignIn";
 import { useCheckNN } from "../../hooks/query/useCheckNN";
+import TermsofUse from "./TermsofUse";
+
 const SignIn = () => {
   const { signIn } = useSignin();
   const [nickName, setNickName] = useState("");
   const { data, refetch } = useCheckNN(nickName);
   const [studentId, setStudentId] = useState("");
   const [nameChecked, setNameChecked] = useState(false);
-  const isValid = nickName && studentId;
+
+  const [termsValid, setTermsValid] = useState(false);
+
+  const isProfileValid = nickName && studentId;
+  const canSubmit = isProfileValid && termsValid;
+
   const handleDBCheck = async () => {
     await refetch();
     setNameChecked(true);
   };
+
   return (
     <div className="flex flex-col h-[calc(100vh-66px)] justify-between pt-15.25 px-7.5 relative bg-[#FAFAFA]">
       <div className="flex flex-col gap-10">
@@ -28,6 +36,8 @@ const SignIn = () => {
             </p>
           </div>
         </div>
+
+        {/* 입력 영역 */}
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-2.5">
             <p className="text-sm">닉네임</p>
@@ -38,6 +48,7 @@ const SignIn = () => {
                   className="bg-[#F5F5F5] h-9 px-3.75 py-2.5 placeholder:text-[#9E9E9E] rounded-md focus:outline-none w-full"
                   onChange={(e) => {
                     setNickName(e.target.value);
+                    setNameChecked(false);
                   }}
                 />
                 <button
@@ -65,6 +76,7 @@ const SignIn = () => {
                 ))}
             </div>
           </div>
+
           <div className="flex flex-col gap-2.5">
             <p className="text-sm">학번</p>
             <input
@@ -75,16 +87,22 @@ const SignIn = () => {
           </div>
         </div>
       </div>
-      <button
-        disabled={!isValid}
-        className={clsx(
-          "w-full h-13 rounded-md",
 
-          !isValid
+      {/* 약관 내용 (컴포넌트 삽입) */}
+      <div className="mt-6 overflow-y-auto">
+        <TermsofUse onValidityChange={setTermsValid} />
+      </div>
+
+      <button
+        disabled={!canSubmit}
+        className={clsx(
+          "w-full h-13 rounded-md mt-4",
+          !canSubmit
             ? "text-[#9E9E9E] bg-[#E0E0E0]"
             : "bg-[#7424F5] text-[#FAFAFA] cursor-pointer"
         )}
         onClick={() => {
+          if (!canSubmit) return;
           signIn({ nickname: nickName, StudentNo: Number(studentId) });
         }}
       >
