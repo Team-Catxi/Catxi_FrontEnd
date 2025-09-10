@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DepartIcon from "../../../../../assets/icons/departIcon.svg?react";
 import { locationCoordinatesMap } from "../../../../../constants/coordinates";
+
 type DepartureKey = keyof typeof locationCoordinatesMap;
 type LatLng = { latitude: number; longitude: number };
 
@@ -13,30 +14,54 @@ export default function DepartureLayer({
   departureKey,
   onFocus,
 }: DepartureLayerProps) {
+  const coords = useMemo(() => {
+    return departureKey ? locationCoordinatesMap[departureKey] ?? null : null;
+  }, [departureKey]);
+
   const [pt, setPt] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const w = window;
-    if (!departureKey || !w.__kakao || !w.__kakaoMap) return;
+    if (!coords || !w.__kakao || !w.__kakaoMap) return;
 
     const { maps } = w.__kakao;
     const map = w.__kakaoMap;
-    const coords = locationCoordinatesMap[departureKey];
-    if (!coords) return;
+    const latlng = new maps.LatLng(coords.latitude, coords.longitude);
 
-    const update = () => {
-      const latlng = new maps.LatLng(coords.latitude, coords.longitude);
-      const proj = map.getProjection();
-      const p = proj.containerPointFromCoords(latlng); // (x,y)
+    let raf: number | null = null;
+
+    const compute = () => {
+      const p = map.getProjection().containerPointFromCoords(latlng);
       setPt({ x: p.x, y: p.y });
     };
 
-    update();
-    maps.event.addListener(map, "idle", update); // 팬/줌 후 재계산
-    return () => maps.event.removeListener(map, "idle", update);
-  }, [departureKey]);
+    const schedule = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(compute);
+    };
 
-  if (!pt) return null;
+    compute();
+
+    maps.event.addListener(map, "center_changed", schedule);
+    maps.event.addListener(map, "zoom_changed", schedule);
+    maps.event.addListener(map, "idle", schedule);
+
+    const onResize = () => {
+      if (typeof map.relayout === "function") map.relayout();
+      schedule();
+    };
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      maps.event.removeListener(map, "center_changed", schedule);
+      maps.event.removeListener(map, "zoom_changed", schedule);
+      maps.event.removeListener(map, "idle", schedule);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [coords]);
+
+  if (!coords || !pt) return null;
 
   return (
     <div
@@ -46,10 +71,7 @@ export default function DepartureLayer({
         top: pt.y,
         transform: "translate(-50%, -100%)",
       }}
-      onClick={() => {
-        const c = locationCoordinatesMap[departureKey!];
-        onFocus?.(c);
-      }}
+      onClick={() => onFocus?.(coords)}
     >
       <DepartIcon className="w-[3rem] h-[3rem]" />
     </div>
