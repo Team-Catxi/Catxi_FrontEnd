@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Map } from "./_components/Map";
 import MemberCard from "./_components/MemberCard";
 import LocationLayer from "./_components/LocationLayer";
@@ -37,23 +38,22 @@ const MapView = ({
   status,
 }: MapViewProps) => {
   const { data } = useMapGet(roomId);
+  const queryClient = useQueryClient();
   const { setHidden } = useTabBar();
   const { location, error: _locationError } = useKakaoLocation();
 
-  /** 서버에서 내려온 멤버들 */
   const members: ApiMember[] = Array.isArray(data?.data?.coordinates)
     ? data!.data!.coordinates
     : [];
 
-  /** 출발지 키 */
   const d = data?.data?.departure;
   const departureKey: DepartureKey | null =
     typeof d === "string" && d in locationCoordinatesMap ? (d as DepartureKey) : null;
 
-  /** 출발지 좌표 */
   const departureCoords = departureKey ? locationCoordinatesMap[departureKey] : null;
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [mapReady, setMapReady] = useState(false); 
 
   useEffect(() => {
     setHidden(true);
@@ -68,13 +68,22 @@ const MapView = ({
     }
   }, [members, selectedId]);
 
-  const handleSelect = (id: string | null) => setSelectedId(id);
+  const handleSelect = (id: string | null, pos?: { lat: number; lng: number }) => {
+    setSelectedId(id);
 
-  /** 좌표 publish (내 위치 바뀔 때마다) */
+    if (id && pos && window.__kakao && window.__kakaoMap) {
+      const kakao = window.__kakao;
+      const map = window.__kakaoMap;
+      const latlng = new kakao.maps.LatLng(pos.lat, pos.lng);
+      map.panTo(latlng);
+    }
+  };
+
   useEffect(() => {
     if (status !== "connected" || !location) return;
 
     const me = members.find((m) => m.email === myEmail);
+
     sendCoordinate({
       roomId,
       email: myEmail,
@@ -84,14 +93,34 @@ const MapView = ({
       longitude: location.longitude,
     });
 
-    console.log("좌표 전송됨:", location.latitude, location.longitude);
-  }, [status, location, roomId, myEmail, members, sendCoordinate]);
+    queryClient.setQueryData(["mapGet", roomId], (old: any) => {
+      if (!old?.data) return old;
+      const updatedCoords = old.data.coordinates.map((m: ApiMember) =>
+        m.email === myEmail
+          ? { ...m, latitude: location.latitude, longitude: location.longitude }
+          : m
+      );
+      return {
+        ...old,
+        data: {
+          ...old.data,
+          coordinates: updatedCoords,
+        },
+      };
+    });
+
+    console.log("좌표 전송 & 즉시 반영됨:", location.latitude, location.longitude);
+  }, [status, location, roomId, myEmail, members, sendCoordinate, queryClient]);
 
   return (
     <div className="absolute inset-0">
       {/* 지도 */}
       <div className="absolute inset-0 z-0">
-        <Map initialCenter={departureCoords} level={3} />
+        <Map
+          initialCenter={departureCoords}
+          level={3}
+          onMapReady={() => setMapReady(true)} // 준비되면 알림
+        />
       </div>
 
       <div className="absolute inset-0 z-10 pointer-events-none">
@@ -110,17 +139,23 @@ const MapView = ({
         </div>
 
         {/* 멤버 마커 */}
-        <LocationLayer
-          members={members}
-          selectedId={selectedId}
-          onSelect={handleSelect}
-          myEmail={myEmail}
-          className="absolute inset-0 pointer-events-auto z-20"
-        />
+        {mapReady && (
+          <LocationLayer
+            members={members}
+            selectedId={selectedId}
+            onSelect={handleSelect}
+            myEmail={myEmail}
+            className="absolute inset-0 pointer-events-auto z-20"
+          />
+        )}
 
         {/* 하단 멤버 카드 */}
         <div className="absolute bottom-5 left-0 right-0 px-4 pointer-events-auto">
-          <MemberCard members={members} selectedId={selectedId} onSelect={handleSelect} />
+          <MemberCard
+            members={members}
+            selectedId={selectedId}
+            onSelect={handleSelect}
+          />
         </div>
       </div>
     </div>

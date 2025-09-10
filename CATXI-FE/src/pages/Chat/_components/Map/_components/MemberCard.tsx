@@ -4,7 +4,7 @@ import type { ApiMember } from "../../../../../types/chat/members";
 interface MemberCardProps {
   members: ApiMember[];
   selectedId: string | null;
-  onSelect: (id: string | null) => void;
+  onSelect: (id: string | null, pos?: { lat: number; lng: number }) => void; // 좌표도 전달
   className?: string;
 }
 
@@ -18,18 +18,20 @@ export default function MemberCard({
 }: MemberCardProps) {
   const handleClick = (member: ApiMember) => {
     const id = makeStableId(member);
-    onSelect(selectedId === id ? null : id);
+    const nextId = selectedId === id ? null : id;
 
+    let pos: { lat: number; lng: number } | undefined;
     const { latitude, longitude, name, email } = member;
+
     if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
-      console.log(
-        "클릭한 멤버 좌표:",
-        { name, email },
-        { latitude, longitude }
-      );
+      pos = { lat: latitude!, lng: longitude! };
+      console.log("클릭한 멤버 좌표:", { name, email }, pos);
     } else {
       console.log("좌표 없음:", { name, email, latitude, longitude });
     }
+
+    // id와 좌표(pos)를 함께 전달
+    onSelect(nextId, pos);
   };
 
   return (
@@ -51,7 +53,7 @@ export default function MemberCard({
                 member={m}
                 selected={selectedId === id}
                 onClick={() => handleClick(m)}
-                maskName={true} 
+                maskName={true}
               />
             );
           })}
