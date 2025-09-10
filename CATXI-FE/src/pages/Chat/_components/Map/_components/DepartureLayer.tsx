@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { locationCoordinatesMap } from "../../../../../constants/coordinates";
-import DepartIcon from "../../../../../assets/icons/departure.svg?react";
+import DepartIcon from "../../../../../assets/icons/departIcon.svg?react";
 
 type DepartureKey = keyof typeof locationCoordinatesMap;
 type LatLng = { latitude: number; longitude: number };
