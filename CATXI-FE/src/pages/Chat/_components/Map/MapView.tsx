@@ -11,6 +11,7 @@ import { locationCoordinatesMap } from "../../../../constants/coordinates";
 import type { ConnectionStatus } from "../../../../hooks/socket/useChatSocket";
 import { useKakaoLocation } from "../../../../apis/kakaoMap/useKakaoLocation";
 import DepartureLayer from "./_components/DepartureLayer";
+import BackBtn from "./_components/BackBtn";
 
 type DepartureKey = keyof typeof locationCoordinatesMap;
 
@@ -155,12 +156,7 @@ const MapView = ({
           aria-label="헤더"
           className="absolute pointer-events-auto top-5 left-0 right-0 flex justify-between items-center px-[1.5rem] z-30 "
         >
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-          >
-            닫기
-          </button>
+          <BackBtn onClose={onClose} />
           <DepartureMarker
             departureKey={departureKey}
             onFocus={focusToCoords}
