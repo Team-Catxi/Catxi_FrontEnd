@@ -30,7 +30,7 @@ const HomePage = () => {
 
   return (
     <div className="w-full h-screen flex flex-col bg-[#FAFAFA]">
-      <div className="sticky top-0 z-50 bg-white">
+      <div className="sticky top-0 z-50">
         <CategoryTab direction={direction} setDirection={setDirection} />
       </div>
 
@@ -41,19 +41,19 @@ const HomePage = () => {
           onSelectLocation={handleSelectLocation}
           onSelectSort={setSort}
         />
+      </div>
 
-        <div className="flex-1 overflow-y-auto mb-[6rem] custom-scrollbar">
-          <ChatCardList
-            direction={direction}
-            station={selectedLocations[direction] || ""}
-            sort={sort}
-            page={page}
-          />
-        </div>
+      <div className="flex-1 overflow-y-auto mb-[6rem] custom-scrollbar">
+        <ChatCardList
+          direction={direction}
+          station={selectedLocations[direction] || ""}
+          sort={sort}
+          page={page}
+        />
+      </div>
 
-        <div className="absolute bottom-6 right-6">
-          <FloatingButton />
-        </div>
+      <div className="absolute bottom-6 right-6">
+        <FloatingButton />
       </div>
     </div>
   );
