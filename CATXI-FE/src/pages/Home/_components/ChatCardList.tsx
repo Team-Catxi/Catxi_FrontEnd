@@ -6,6 +6,7 @@ import Logo from "../../../assets/icons/CatxiLogo.svg?react";
 import NoContent from "../../../assets/icons/noContent.svg?react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { queryClient } from "../../../App";
 
 interface ChatCardListProps {
   direction: string;
@@ -22,6 +23,7 @@ const ChatCardList = ({
 }: ChatCardListProps) => {
   const navigate = useNavigate();
   const [retryCount, setRetryCount] = useState(0);
+
   const { data, isLoading, isError } = useChatRooms({
     direction,
     station,
@@ -39,9 +41,12 @@ const ChatCardList = ({
     });
   }, [data]);
 
-  const handleRetry = () => {
+  const handleRetry = async () => {
     const nextCount = retryCount + 1;
     setRetryCount(nextCount);
+
+    await queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
+    await queryClient.refetchQueries({ queryKey: ["chatRooms"] });
 
     if (nextCount < 4) {
       window.location.reload();
