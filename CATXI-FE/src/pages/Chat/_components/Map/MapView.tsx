@@ -10,6 +10,8 @@ import DepartureMarker from "./_components/DepartureMarker";
 import { locationCoordinatesMap } from "../../../../constants/coordinates";
 import type { ConnectionStatus } from "../../../../hooks/socket/useChatSocket";
 import { useKakaoLocation } from "../../../../apis/kakaoMap/useKakaoLocation";
+import DepartureLayer from "./_components/DepartureLayer";
+import BackBtn from "./_components/BackBtn";
 
 type DepartureKey = keyof typeof locationCoordinatesMap;
 
@@ -149,6 +151,7 @@ const MapView = ({
           >
             닫기
           </button>
+          <BackBtn onClose={onClose} />
           <DepartureMarker departureKey={departureKey} />
         </div>
 
@@ -161,6 +164,10 @@ const MapView = ({
             myEmail={myEmail}
             className="absolute inset-0 pointer-events-auto z-20"
           />
+        )}
+        {/* 출발지 마커 (디버그용) */}
+        {mapReady && departureCoords && (
+          <DepartureLayer departureKey={departureKey} />
         )}
 
         {/* 하단 멤버 카드 */}
