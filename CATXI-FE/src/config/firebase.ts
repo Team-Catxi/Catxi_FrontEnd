@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
+import { getMessaging, onMessage, isSupported } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -18,13 +18,19 @@ const app = initializeApp(firebaseConfig);
 let messaging: ReturnType<typeof getMessaging> | null = null;
 
 export const initializeMessaging = async () => {
-  if (typeof window !== "undefined" && "serviceWorker" in navigator && window.isSecureContext) {
+  if (
+    typeof window !== "undefined" &&
+    "serviceWorker" in navigator &&
+    window.isSecureContext
+  ) {
     const supported = await isSupported();
     if (supported) {
       messaging = getMessaging(app);
+      console.log("Firebase Messaging initialized");
+    } else {
+      console.warn("이 브라우저에서는 FCM Web Push를 지원하지 않습니다.");
     }
   }
 };
-initializeMessaging();
 
-export { messaging, getToken, onMessage };
+export { messaging, onMessage };

@@ -13,20 +13,36 @@ export const useFCM = () => {
   const [token, setToken] = useState<string | null>(null);
   const [notification, setNotification] = useState<FCMNotification | null>(null);
 
+  const requestNotificationPermission = async (): Promise<boolean> => {
+    try {
+      if (Notification.permission === "granted") return true;
+      if (Notification.permission === "denied") return false;
+
+      const permission = await Notification.requestPermission();
+      return permission === "granted";
+    } catch (err) {
+      console.error("알림 권한 요청 실패:", err);
+      return false;
+    }
+  };
+
   const requestFCMToken = async (): Promise<string | null> => {
-    if (!messaging) return null;
-
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") return null;
-
-    if ("serviceWorker" in navigator) {
-      await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+    if (!messaging) {
+      console.warn("Firebase messaging이 아직 초기화되지 않았습니다.");
+      return null;
     }
 
-    const currentToken = await getToken(messaging, { vapidKey: VAPID_KEY });
-    if (currentToken) {
-      setToken(currentToken);
-      return currentToken;
+    try {
+      const currentToken = await getToken(messaging, { vapidKey: VAPID_KEY });
+      if (currentToken) {
+        setToken(currentToken);
+        console.log("FCM 토큰 발급 성공:", currentToken);
+        return currentToken;
+      } else {
+        console.warn("FCM 토큰을 발급받지 못했습니다.");
+      }
+    } catch (error) {
+      console.error("FCM 토큰 요청 중 오류:", error);
     }
     return null;
   };
@@ -34,13 +50,16 @@ export const useFCM = () => {
   const registerTokenToBackend = async (fcmToken: string) => {
     try {
       await axiosInstance.put("/api/fcm/token", { token: fcmToken });
-      console.log("FCM token registered:", fcmToken);
+      console.log("서버에 FCM 토큰 등록 완료:", fcmToken);
     } catch (err) {
-      console.error("Failed to register FCM token:", err);
+      console.error("서버에 FCM 토큰 등록 실패:", err);
     }
   };
 
   const initializeFCM = async () => {
+    const granted = await requestNotificationPermission();
+    if (!granted) return;
+
     const fcmToken = await requestFCMToken();
     if (fcmToken) {
       await registerTokenToBackend(fcmToken);
@@ -64,8 +83,9 @@ export const useFCM = () => {
   return {
     token,
     notification,
-    initializeFCM,       
-    requestFCMToken,      
-    registerTokenToBackend 
+    requestNotificationPermission,
+    requestFCMToken,
+    registerTokenToBackend,
+    initializeFCM,
   };
 };
