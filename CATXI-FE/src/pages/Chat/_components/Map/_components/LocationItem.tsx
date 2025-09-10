@@ -42,7 +42,7 @@ const LocationItem = ({
       tabIndex={0}
       onClick={onClick}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onClick?.()}
-      className={`cursor-pointer select-none flex flex-col items-center -translate-x-1/2 -translate-y-full ${className}`}
+      className={`cursor-pointer select-none flex flex-col items-center ${className}`}
       aria-selected={selected}
     >
       {/* 이름 */}
