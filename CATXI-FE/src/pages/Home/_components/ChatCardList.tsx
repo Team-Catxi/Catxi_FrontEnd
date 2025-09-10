@@ -6,7 +6,7 @@ import Logo from "../../../assets/icons/CatxiLogo.svg?react";
 import NoContent from "../../../assets/icons/noContent.svg?react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "../../../App";
 
 interface ChatCardListProps {
   direction: string;
@@ -22,7 +22,6 @@ const ChatCardList = ({
   page = 0,
 }: ChatCardListProps) => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [retryCount, setRetryCount] = useState(0);
 
   const { data, isLoading, isError } = useChatRooms({
