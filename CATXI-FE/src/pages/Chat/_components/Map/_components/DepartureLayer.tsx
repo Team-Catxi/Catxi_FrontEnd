@@ -8,18 +8,15 @@ type LatLng = { latitude: number; longitude: number };
 interface DepartureLayerProps {
   departureKey: DepartureKey | null;
   onFocus?: (coords: LatLng) => void;
-  freezeDuringDrag?: boolean;
 }
 
 export default function DepartureLayer({
   departureKey,
   onFocus,
-  freezeDuringDrag = true,
 }: DepartureLayerProps) {
-  const coords = useMemo(
-    () => (departureKey ? locationCoordinatesMap[departureKey] ?? null : null),
-    [departureKey]
-  );
+  const coords = useMemo(() => {
+    return departureKey ? locationCoordinatesMap[departureKey] ?? null : null;
+  }, [departureKey]);
 
   const [pt, setPt] = useState<{ x: number; y: number } | null>(null);
 
@@ -32,12 +29,12 @@ export default function DepartureLayer({
     const latlng = new maps.LatLng(coords.latitude, coords.longitude);
 
     let raf: number | null = null;
-    let dragging = false;
 
     const compute = () => {
       const p = map.getProjection().containerPointFromCoords(latlng);
       setPt({ x: p.x, y: p.y });
     };
+
     const schedule = () => {
       if (raf) cancelAnimationFrame(raf);
       raf = requestAnimationFrame(compute);
@@ -45,30 +42,8 @@ export default function DepartureLayer({
 
     compute();
 
-    const onDragStart = () => {
-      dragging = true;
-    };
-    const onDragEnd = () => {
-      dragging = false;
-      schedule();
-    };
-    const onCenterChanged = () => {
-      if (!freezeDuringDrag) {
-        schedule();
-        return;
-      }
-      if (!dragging) {
-        schedule();
-      }
-    };
-    const onZoomChanged = () => {
-      schedule();
-    };
-
-    maps.event.addListener(map, "dragstart", onDragStart);
-    maps.event.addListener(map, "dragend", onDragEnd);
-    maps.event.addListener(map, "center_changed", onCenterChanged);
-    maps.event.addListener(map, "zoom_changed", onZoomChanged);
+    maps.event.addListener(map, "center_changed", schedule);
+    maps.event.addListener(map, "zoom_changed", schedule);
     maps.event.addListener(map, "idle", schedule);
 
     const onResize = () => {
@@ -79,14 +54,12 @@ export default function DepartureLayer({
 
     return () => {
       if (raf) cancelAnimationFrame(raf);
-      maps.event.removeListener(map, "dragstart", onDragStart);
-      maps.event.removeListener(map, "dragend", onDragEnd);
-      maps.event.removeListener(map, "center_changed", onCenterChanged);
-      maps.event.removeListener(map, "zoom_changed", onZoomChanged);
+      maps.event.removeListener(map, "center_changed", schedule);
+      maps.event.removeListener(map, "zoom_changed", schedule);
       maps.event.removeListener(map, "idle", schedule);
       window.removeEventListener("resize", onResize);
     };
-  }, [coords, freezeDuringDrag]);
+  }, [coords]);
 
   if (!coords || !pt) return null;
 
