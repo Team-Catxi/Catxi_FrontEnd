@@ -28,7 +28,7 @@ export default function DepartureMarker({
 
   return (
     <div
-      className={`p-[0.5rem] bg-violet-600 rounded-[2rem] items-center gap-[0.25rem] pointer-events-auto ${className}`}
+      className={`p-[0.5rem] flex flex-row bg-violet-600 rounded-[2rem] items-center gap-[0.25rem] pointer-events-auto ${className}`}
       onClick={handleClick}
     >
       <img
