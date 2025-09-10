@@ -1,4 +1,4 @@
-import ArrowUpLight from "../../../../assets/icons/arrow-up-light.svg?react";
+import ArrowUpLight from "../../../../../assets/icons/arrow-up-light.svg?react";
 
 interface BackBtnProps {
   onClose: () => void;
