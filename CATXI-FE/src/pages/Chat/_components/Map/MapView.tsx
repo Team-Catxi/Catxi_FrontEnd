@@ -36,29 +36,9 @@ const MapView = ({
   sendCoordinate,
   status,
 }: MapViewProps) => {
-  const { data, isLoading, isError, error } = useMapGet(roomId);
+  const { data } = useMapGet(roomId);
   const { setHidden } = useTabBar();
-  const { location, error: locationError } = useKakaoLocation();
-
-  if (isLoading) {
-    return <p className="text-center text-gray-500">지도를 불러오는 중...</p>;
-  }
-
-  if (isError) {
-    return (
-      <p className="text-center text-red-500">
-        좌표 데이터를 불러오지 못했습니다: {String(error)}
-      </p>
-    );
-  }
-
-  if (locationError) {
-    return (
-      <p className="text-center text-red-500">
-        위치 권한 오류: {locationError}
-      </p>
-    );
-  }
+  const { location, error: _locationError } = useKakaoLocation();
 
   /** 서버에서 내려온 멤버들 */
   const members: ApiMember[] = Array.isArray(data?.data?.coordinates)
