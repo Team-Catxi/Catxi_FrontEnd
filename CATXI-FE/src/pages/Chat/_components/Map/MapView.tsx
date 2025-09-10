@@ -48,12 +48,16 @@ const MapView = ({
 
   const d = data?.data?.departure;
   const departureKey: DepartureKey | null =
-    typeof d === "string" && d in locationCoordinatesMap ? (d as DepartureKey) : null;
+    typeof d === "string" && d in locationCoordinatesMap
+      ? (d as DepartureKey)
+      : null;
 
-  const departureCoords = departureKey ? locationCoordinatesMap[departureKey] : null;
+  const departureCoords = departureKey
+    ? locationCoordinatesMap[departureKey]
+    : null;
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [mapReady, setMapReady] = useState(false); 
+  const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
     setHidden(true);
@@ -63,12 +67,18 @@ const MapView = ({
   }, [setHidden]);
 
   useEffect(() => {
-    if (selectedId !== null && !members.some((m) => makeStableId(m) === selectedId)) {
+    if (
+      selectedId !== null &&
+      !members.some((m) => makeStableId(m) === selectedId)
+    ) {
       setSelectedId(null);
     }
   }, [members, selectedId]);
 
-  const handleSelect = (id: string | null, pos?: { lat: number; lng: number }) => {
+  const handleSelect = (
+    id: string | null,
+    pos?: { lat: number; lng: number }
+  ) => {
     setSelectedId(id);
 
     if (id && pos && window.__kakao && window.__kakaoMap) {
@@ -109,7 +119,11 @@ const MapView = ({
       };
     });
 
-    console.log("좌표 전송 & 즉시 반영됨:", location.latitude, location.longitude);
+    console.log(
+      "좌표 전송 & 즉시 반영됨:",
+      location.latitude,
+      location.longitude
+    );
   }, [status, location, roomId, myEmail, members, sendCoordinate, queryClient]);
 
   return (
@@ -127,7 +141,7 @@ const MapView = ({
         {/* 상단 헤더 */}
         <div
           aria-label="헤더"
-          className="absolute top-5 left-0 right-0 flex justify-between items-center px-[1.5rem] z-30 "
+          className="absolute pointer-events-auto top-5 left-0 right-0 flex justify-between items-center px-[1.5rem] z-30 "
         >
           <button
             onClick={onClose}

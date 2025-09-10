@@ -11,7 +11,7 @@ import { useChatRoomActivity } from "../hooks/active/useChatRoomActivity";
 const ChatLayout = () => {
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const parsedRoomId = Number(roomId ?? 0); 
+  const parsedRoomId = Number(roomId ?? 0);
   const [input, setInput] = useState("");
   const [showMap, setShowMap] = useState(false);
 
@@ -19,8 +19,8 @@ const ChatLayout = () => {
     messages,
     myEmail,
     sendMessage,
-    sendCoordinate,  
-    status,          
+    sendCoordinate,
+    status,
     nicknameMap,
     hostEmail,
     hostNickname,
@@ -34,7 +34,7 @@ const ChatLayout = () => {
 
   useChatRoomActivity({
     roomId: parsedRoomId,
-    inactiveThreshold: 30000, 
+    inactiveThreshold: 30000,
   });
 
   const handleSubmit = () => {
@@ -101,8 +101,8 @@ const ChatLayout = () => {
             roomId={parsedRoomId}
             onClose={() => setShowMap(false)}
             myEmail={myEmail || ""}
-            sendCoordinate={sendCoordinate}   
-            status={status}                  
+            sendCoordinate={sendCoordinate}
+            status={status}
           />
         ) : (
           <Outlet context={contextValue} />
