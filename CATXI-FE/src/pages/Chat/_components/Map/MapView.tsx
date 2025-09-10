@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react"; // [ADDED] useCallback 추가
 import { useQueryClient } from "@tanstack/react-query";
 import { Map } from "./_components/Map";
 import MemberCard from "./_components/MemberCard";
@@ -10,6 +10,7 @@ import DepartureMarker from "./_components/DepartureMarker";
 import { locationCoordinatesMap } from "../../../../constants/coordinates";
 import type { ConnectionStatus } from "../../../../hooks/socket/useChatSocket";
 import { useKakaoLocation } from "../../../../apis/kakaoMap/useKakaoLocation";
+import DepartureLayer from "./_components/DepartureLayer";
 
 type DepartureKey = keyof typeof locationCoordinatesMap;
 
@@ -89,6 +90,17 @@ const MapView = ({
     }
   };
 
+  const focusToCoords = useCallback(
+    (c: { latitude: number; longitude: number }) => {
+      const w = window;
+      if (!w.__kakao || !w.__kakaoMap) return;
+      const kakao = w.__kakao;
+      const map = w.__kakaoMap;
+      map.panTo(new kakao.maps.LatLng(c.latitude, c.longitude));
+    },
+    []
+  );
+
   useEffect(() => {
     if (status !== "connected" || !location) return;
 
@@ -133,7 +145,7 @@ const MapView = ({
         <Map
           initialCenter={departureCoords}
           level={3}
-          onMapReady={() => setMapReady(true)} // 준비되면 알림
+          onMapReady={() => setMapReady(true)}
         />
       </div>
 
@@ -149,10 +161,12 @@ const MapView = ({
           >
             닫기
           </button>
-          <DepartureMarker departureKey={departureKey} />
+          <DepartureMarker
+            departureKey={departureKey}
+            onFocus={focusToCoords}
+          />
         </div>
-
-        {/* 멤버 마커 */}
+        {/*마커 레이어*/}
         {mapReady && (
           <LocationLayer
             members={members}
@@ -161,6 +175,10 @@ const MapView = ({
             myEmail={myEmail}
             className="absolute inset-0 pointer-events-auto z-20"
           />
+        )}
+
+        {mapReady && departureCoords && (
+          <DepartureLayer departureKey={departureKey} onFocus={focusToCoords} />
         )}
 
         {/* 하단 멤버 카드 */}
