@@ -8,22 +8,21 @@ type LatLng = { latitude: number; longitude: number };
 interface DepartureMarkerProps {
   departureKey: DepartureKey | null;
   className?: string;
+  onFocus?: (coords: LatLng) => void;
 }
 
 export default function DepartureMarker({
   departureKey,
   className = "",
+  onFocus,
 }: DepartureMarkerProps) {
   const coords = useMemo<LatLng | null>(() => {
     return departureKey ? locationCoordinatesMap[departureKey] ?? null : null;
   }, [departureKey]);
 
   const handleClick = () => {
-    if (coords) {
-      console.log("출발지 좌표:", coords);
-    } else {
-      console.log("출발지 좌표 없음(유효한 departureKey 아님):", departureKey);
-    }
+    if (coords && onFocus) onFocus(coords);
+    else if (!coords) console.log("출발지 좌표 없음:", departureKey);
   };
 
   return (
