@@ -69,10 +69,10 @@ export const useFCM = () => {
   useEffect(() => {
     if (!messaging) return;
     const unsubscribe = onMessage(messaging, (payload) => {
-      if (payload.notification) {
+      if (payload.data) {
         setNotification({
-          title: payload.notification.title || "",
-          body: payload.notification.body || "",
+          title: payload.data.title || "새 알림",
+          body: payload.data.body || "",
           data: payload.data,
         });
       }

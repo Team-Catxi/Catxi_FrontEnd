@@ -16,9 +16,9 @@ firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  const notificationTitle = payload.notification.title;
+  const notificationTitle = payload.data?.title || "새 알림";
   const notificationOptions = {
-    body: payload.notification.body,
+    body: payload.data?.body || "",
     icon: "/favicon.ico",
   };
 
