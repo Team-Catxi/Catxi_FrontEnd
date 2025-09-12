@@ -94,23 +94,21 @@ const ChatLayout = () => {
   }
 
   return (
-    <div className="flex flex-col relative w-full min-h-screen bg-background overflow-hidden">
-      <div className="flex-1 overflow-y-auto pb-[80px]">
-        {showMap ? (
-          <MapView
-            roomId={parsedRoomId}
-            onClose={() => setShowMap(false)}
-            myEmail={myEmail || ""}
-            sendCoordinate={sendCoordinate}
-            status={status}
-          />
-        ) : (
-          <Outlet context={contextValue} />
-        )}
-      </div>
+    <div className="flex flex-col w-full min-h-screen bg-background overflow-hidden">
+      {showMap ? (
+        <MapView
+          roomId={parsedRoomId}
+          onClose={() => setShowMap(false)}
+          myEmail={myEmail || ""}
+          sendCoordinate={sendCoordinate}
+          status={status}
+        />
+      ) : (
+        <Outlet context={contextValue} />
+      )}
 
       {!showMap && (
-        <div className="fixed bottom-0 left-0 w-full border-t border-b border-gray-300 bg-background px-[1.656rem] pt-[0.625rem] pb-[0.938rem] z-100 flex-1">
+        <div className="fixed bottom-0 left-0 w-full border-t border-gray-300 bg-background px-6 pt-2 pb-[calc(env(safe-area-inset-bottom)+12px)]">
           <ChatInput
             value={input}
             onChange={setInput}
