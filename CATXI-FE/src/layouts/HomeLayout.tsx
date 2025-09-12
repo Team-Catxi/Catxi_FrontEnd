@@ -7,7 +7,7 @@ import { TabBarProvider, useTabBar } from "../contexts/TabBarContext";
 const LayoutInner = () => {
   const { hidden } = useTabBar();
   return (
-    <div className="w-full h-screen relative flex flex-col">
+    <div className="w-full h-screen relative flex flex-col pb-[3.75rem]">
       <Outlet />
       {!hidden && <TabBar />}
     </div>
