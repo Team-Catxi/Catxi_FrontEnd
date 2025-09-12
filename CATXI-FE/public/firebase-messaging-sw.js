@@ -16,10 +16,22 @@ firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  const notificationTitle = payload.data?.title || "새 알림";
+  console.log('백그라운드 메시지 수신:', payload);
+  
+  // 중복 방지: preventDuplicate 플래그가 있으면 수동 알림을 생성하지 않음
+  if (payload.data?.preventDuplicate === "true") {
+    console.log('중복 방지: 백그라운드에서 수동 알림 생성 스킵');
+    return; // OS의 notification 페이로드 알림만 표시
+  }
+  
+  // 기존 로직 (preventDuplicate가 없는 경우에만 실행)
+  const notificationTitle = payload.data?.title || payload.notification?.title || "새 알림";
+  const notificationBody = payload.data?.body || payload.notification?.body || "";
+  
   const notificationOptions = {
-    body: payload.data?.body || "",
+    body: notificationBody,
     icon: "/favicon.ico",
+    data: payload.data,
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);

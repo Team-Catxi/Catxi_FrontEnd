@@ -69,10 +69,22 @@ export const useFCM = () => {
   useEffect(() => {
     if (!messaging) return;
     const unsubscribe = onMessage(messaging, (payload) => {
-      if (payload.data) {
+      console.log('포그라운드 메시지 수신:', payload);
+      
+      // 중복 방지: preventDuplicate 플래그가 있으면 포그라운드에서도 알림 생성하지 않음
+      if (payload.data?.preventDuplicate === "true") {
+        console.log('중복 방지: 포그라운드에서 알림 생성 스킵');
+        return; // notification 페이로드가 있어도 별도 처리 안 함
+      }
+      
+      // 기존 로직 (preventDuplicate가 없는 경우에만 실행)
+      const title = payload.data?.title || payload.notification?.title || "새 알림";
+      const body = payload.data?.body || payload.notification?.body || "";
+      
+      if (title || body) {
         setNotification({
-          title: payload.data.title || "새 알림",
-          body: payload.data.body || "",
+          title,
+          body,
           data: payload.data,
         });
       }
