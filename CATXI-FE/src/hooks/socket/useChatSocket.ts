@@ -6,6 +6,7 @@ import type { Client } from "webstomp-client";
 import { publishTopic, mapPublish } from "./topics.ts";
 import type { SubRefs } from "./subscriptions";
 import { cleanupSubscriptions, setupSubscriptions } from "./subscriptions";
+import { queryClient } from "../../App.tsx";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_API_URL;
 
@@ -94,6 +95,7 @@ export function useChatSocket(
             cleanupSubscriptions(subRefs.current);
             stompClient.disconnect();
             setStatus("idle");
+            queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
             navigate("/home");
           },
         });
