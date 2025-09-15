@@ -80,7 +80,6 @@ const TabBar = () => {
           justify-center 
           items-center 
           shadow-[0_-4px_5px_0_rgba(0,0,0,0.05)] 
-          z-[999]
         "
       >
         <div className="cursor-pointer" onClick={handleHomeClick}>

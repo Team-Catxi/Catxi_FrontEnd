@@ -85,7 +85,7 @@ const TimePicker = ({ onCancel }: PickerProp) => {
   };
 
   return (
-    <div className="absolute z-50 top-0 left-0 w-full h-full bg-[#1B1B1B80] flex justify-center items-center">
+    <div className="fixed z-[10000] top-0 left-0 w-full h-screen bg-[#1B1B1B80] flex justify-center items-center">
       <div className="bg-white w-65 h-85.25 rounded-sm flex flex-col">
         <div className="flex flex-col items-center w-full h-full pt-5 px-2.5 gap-3.75">
           <p className="text-base font-medium">출발 시간 선택</p>
