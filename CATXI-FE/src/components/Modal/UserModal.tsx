@@ -34,8 +34,8 @@ const ChatMemberModal = ({
 
   return (
     <div className="flex flex-col items-center w-full">
-      <h2 className="text-lg font-bold text-center mb-[0.938rem]">{`${name} (${nickname})`}</h2>
-      <div className="flex flex-col w-full gap-[1.25rem]">
+      <h2 className="text-lg font-bold text-center mb-[0.938rem]">{`${name}`}</h2>
+      <div className="flex flex-col w-full gap-3">
         <button
           onClick={handleReportClick}
           className={`py-[0.625rem] font-medium text-[0.875rem] rounded-lg ${
@@ -49,7 +49,7 @@ const ChatMemberModal = ({
         {onKick && (
           <button
             onClick={onKick}
-            className="bg-[#424242] text-[#FEFEFE] text-sm py-[0.625rem] rounded-lg mt-[0.625rem]"
+            className="bg-[#424242] text-[#FEFEFE] text-sm py-[0.625rem] rounded-lg"
           >
             강퇴하기
           </button>
