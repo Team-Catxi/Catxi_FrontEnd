@@ -8,18 +8,17 @@ import TermsofUse from "./TermsofUse";
 const SignIn = () => {
   const { signIn } = useSignin();
   const [nickName, setNickName] = useState("");
-  const { data, refetch } = useCheckNN(nickName);
+  const { refetch } = useCheckNN(nickName);
   const [studentId, setStudentId] = useState("");
-  const [nameChecked, setNameChecked] = useState(false);
-
+  const [nameChecked, setNameChecked] = useState<boolean | null>(null);
   const [termsValid, setTermsValid] = useState(false);
 
   const isProfileValid = nickName && studentId;
   const canSubmit = isProfileValid && termsValid;
 
   const handleDBCheck = async () => {
-    await refetch();
-    setNameChecked(true);
+    const data = await refetch(); 
+    setNameChecked(data.data ?? null);
   };
 
   return (
@@ -48,7 +47,7 @@ const SignIn = () => {
                   className="bg-[#F5F5F5] h-9 px-3.75 py-2.5 placeholder:text-[#9E9E9E] rounded-md focus:outline-none w-full"
                   onChange={(e) => {
                     setNickName(e.target.value);
-                    setNameChecked(false);
+                    setNameChecked(null);
                   }}
                 />
                 <button
@@ -64,8 +63,8 @@ const SignIn = () => {
                   중복확인
                 </button>
               </div>
-              {nameChecked &&
-                (data ? (
+              {nameChecked !== null &&
+                (nameChecked ? (
                   <p className="text-xs text-[#FF5252]">
                     이미 사용 중인 닉네임입니다.
                   </p>
