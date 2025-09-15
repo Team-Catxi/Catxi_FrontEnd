@@ -3,7 +3,7 @@ import ChatMemberModal from "../../../components/Modal/UserModal";
 import ChatBubble from "./ChatItem/ChatBubble";
 import { useChatActions } from "../../../hooks/chatAction/useChatActions";
 import { formatTimestamp } from "../../../utils/chat/format";
-// import { getDisplayName } from "../../../utils/chat/displayName";
+import { getDisplayName } from "../../../utils/chat/displayName";
 
 interface ChatContext {
   nicknameMap: Record<string, string>;
@@ -17,9 +17,9 @@ interface Props {
   isMe: boolean;
   senderEmail: string;
   sentAt: string;
-  showName?: boolean;
-  showTimestamp?: boolean;
-  gapClass?: string;
+  showName?: boolean;  
+  showTimestamp?: boolean;   
+  gapClass?: string;     
 }
 
 const ChatItem = ({
@@ -33,10 +33,11 @@ const ChatItem = ({
 }: Props) => {
   const { nicknameMap, hostEmail, myEmail } = useOutletContext<ChatContext>();
   const { roomId } = useParams();
+
   const isMyself = senderEmail === myEmail;
   const isHost = myEmail === hostEmail;
   const isTargetHost = senderEmail === hostEmail;
-  const displayName = nicknameMap[senderEmail];
+  const displayName = getDisplayName(senderEmail, nicknameMap);
 
   const { handleReport, handleKick, openModal } = useChatActions(
     Number(roomId),
@@ -44,24 +45,24 @@ const ChatItem = ({
   );
 
   const handleNameClick = () => {
-    if (isMyself || !displayName) return;
+    if (isMyself) return;
     openModal(
       <ChatMemberModal
         name={displayName}
-        nickname={displayName}
+        nickname={nicknameMap[senderEmail]}
         isHost={isHost}
         isMyself={isMyself}
         roomId={parseInt(roomId ?? "0")}
         targetUserId={senderEmail}
         onReport={handleReport}
         onKick={isHost && !isTargetHost ? handleKick : undefined}
-      />,
+      />
     );
   };
 
   return (
     <div className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
-      {showName && displayName && (
+      {showName && (
         <div
           className="flex items-center gap-[0.5rem] mb-1"
           onClick={handleNameClick}
