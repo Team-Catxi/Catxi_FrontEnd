@@ -9,8 +9,3 @@ export const mapTopic = (roomId: number) => `/topic/map/${roomId}`;
 export const mapPublish = (roomId: number) => `/publish/map/${roomId}`;
 export const resultTopic = (roomId: number) =>
   `/topic/ready/${roomId}/result`;
-export const kickTopic = () => {
-  const topic = `/user/queue/kick`;
-  console.log("[WebSocket] 강퇴 토픽 구독:", topic);
-  return topic;
-};
