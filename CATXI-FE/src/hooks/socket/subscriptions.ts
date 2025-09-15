@@ -7,7 +7,6 @@ import {
   deletedTopic,
   mapTopic, 
   resultTopic,
-  kickTopic,
 } from "./topics.ts";
 
 export interface SubRefs {
@@ -18,7 +17,6 @@ export interface SubRefs {
   deleted: Subscription | null;
   map: Subscription | null;
   result: Subscription | null;
-  kick: Subscription | null;
 }
 
 export const cleanupSubscriptions = (refs: SubRefs) => {
@@ -29,7 +27,6 @@ export const cleanupSubscriptions = (refs: SubRefs) => {
   refs.deleted?.unsubscribe();
   refs.map?.unsubscribe();
   refs.result?.unsubscribe(); 
-  refs.kick?.unsubscribe();
 
   refs.chat = null;
   refs.ready = null;
@@ -38,7 +35,6 @@ export const cleanupSubscriptions = (refs: SubRefs) => {
   refs.deleted = null;
   refs.map = null; 
   refs.result = null;
-  refs.kick = null;
 };
 
 export const setupSubscriptions = (
@@ -52,8 +48,7 @@ export const setupSubscriptions = (
     participants?: (data: any) => void;
     deleted?: (data: any) => void;
     map?: (data: any) => void;
-    result?: (data: any) => void; 
-    kick?: (msg: string) => void; 
+    result?: (data: any) => void;  
   }
 ): SubRefs => {
   return {
@@ -85,13 +80,9 @@ export const setupSubscriptions = (
           Authorization: `Bearer ${jwtToken}`,
         })
       : null, 
+
     result: handlers.result
       ? client.subscribe(resultTopic(roomId), (msg) => handlers.result!(JSON.parse(msg.body)), {
-          Authorization: `Bearer ${jwtToken}`,
-        })
-      : null,
-    kick: handlers.kick
-      ? client.subscribe(kickTopic(), (msg) => handlers.kick!(JSON.parse(msg.body)), {
           Authorization: `Bearer ${jwtToken}`,
         })
       : null,
