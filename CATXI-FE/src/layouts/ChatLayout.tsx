@@ -108,7 +108,7 @@ const ChatLayout = () => {
       )}
 
       {!showMap && (
-        <div className="fixed bottom-0 left-0 w-full border-t border-gray-300 bg-background px-6 pt-2 pb-[calc(env(safe-area-inset-bottom)+12px)]">
+        <div className="fixed bottom-0 left-0 w-full border-t border-gray-300 bg-background px-6 pt-2 pb-[calc(env(safe-area-inset-bottom)+12px)] z-5">
           <ChatInput
             value={input}
             onChange={setInput}
