@@ -1,30 +1,26 @@
 import { useEffect, useRef, useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SockJS from "sockjs-client";
 import * as webstomp from "webstomp-client";
 import type { Client } from "webstomp-client";
-import { publishTopic, mapPublish } from "./topics";
+import { publishTopic, mapPublish } from "./topics.ts";
 import type { SubRefs } from "./subscriptions";
 import { cleanupSubscriptions, setupSubscriptions } from "./subscriptions";
+import { queryClient } from "../../App.tsx";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_API_URL;
 
 export type ConnectionStatus = "idle" | "connecting" | "connected" | "error";
 
-export interface ChatHandlers {
-  chat: (raw: any) => void;
-  ready?: (raw: any) => void;
-  system?: (raw: any) => void;
-  participants: (raw: any) => void;
-  map?: (raw: any) => void;
-  result?: (raw: any) => void;
-  kick?: (raw: any) => void;
-  deleted?: () => void;
-}
-
 export function useChatSocket(
   roomId: number,
   jwtToken: string,
-  handlers: ChatHandlers
+  onChatMessage: (raw: any) => void,
+  onReadyMessage?: (raw: any) => void,
+  onSystemMessage?: (raw: any) => void,
+  onParticipantsMessage?: (raw: any) => void,
+  onMapMessage?: (raw: any) => void,
+  onResultMessage?: (raw: any) => void
 ) {
   const stompClientRef = useRef<Client | null>(null);
   const subRefs = useRef<SubRefs>({
@@ -35,11 +31,34 @@ export function useChatSocket(
     deleted: null,
     map: null,
     result: null,
-    kick: null,
   });
 
   const [status, setStatus] = useState<ConnectionStatus>("idle");
   const isConnectingRef = useRef(false);
+  const chatHandlerRef = useRef(onChatMessage);
+  const readyHandlerRef = useRef(onReadyMessage);
+  const systemHandlerRef = useRef(onSystemMessage);
+  const participantsHandlerRef = useRef(onParticipantsMessage);
+  const mapHandlerRef = useRef(onMapMessage);
+  const resultHandlerRef = useRef(onResultMessage);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    chatHandlerRef.current = onChatMessage;
+    readyHandlerRef.current = onReadyMessage;
+    systemHandlerRef.current = onSystemMessage;
+    participantsHandlerRef.current = onParticipantsMessage;
+    mapHandlerRef.current = onMapMessage;
+    resultHandlerRef.current = onResultMessage;
+  }, [
+    onChatMessage,
+    onReadyMessage,
+    onSystemMessage,
+    onParticipantsMessage,
+    onMapMessage,
+    onResultMessage, 
+  ]);
 
   const connect = useCallback(() => {
     if (isConnectingRef.current || stompClientRef.current?.connected) {
@@ -63,7 +82,23 @@ export function useChatSocket(
         setStatus("connected");
 
         cleanupSubscriptions(subRefs.current);
-        subRefs.current = setupSubscriptions(stompClient, roomId, jwtToken, handlers);
+
+        subRefs.current = setupSubscriptions(stompClient, roomId, jwtToken, {
+          chat: (data) => chatHandlerRef.current?.(data),
+          ready: (data) => readyHandlerRef.current?.(data),
+          system: (data) => systemHandlerRef.current?.(data),
+          participants: (data) => participantsHandlerRef.current?.(data),
+          map: (data) => mapHandlerRef.current?.(data),
+          result: (data) => resultHandlerRef.current?.(data), 
+          deleted: () => {
+            console.warn("[WebSocket] 방 삭제 이벤트 수신");
+            cleanupSubscriptions(subRefs.current);
+            stompClient.disconnect();
+            setStatus("idle");
+            queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
+            navigate("/home");
+          },
+        });
       },
       (err) => {
         console.error("[WebSocket] 연결 실패:", err);
@@ -71,14 +106,16 @@ export function useChatSocket(
         setStatus("error");
       }
     );
-  }, [roomId, jwtToken, handlers]);
+  }, [roomId, jwtToken, navigate]);
 
   const disconnect = useCallback(() => {
     cleanupSubscriptions(subRefs.current);
+
     stompClientRef.current?.disconnect(() => {
       console.log("[WebSocket] 연결 해제됨");
       setStatus("idle");
     });
+
     stompClientRef.current = null;
   }, []);
 
@@ -119,9 +156,7 @@ export function useChatSocket(
     [status, roomId, jwtToken]
   );
 
-  useEffect(() => {
-    return () => disconnect();
-  }, [disconnect]);
+  useEffect(() => () => disconnect(), [disconnect]);
 
   return { connect, disconnect, sendMessage, sendCoordinate, status };
 }
