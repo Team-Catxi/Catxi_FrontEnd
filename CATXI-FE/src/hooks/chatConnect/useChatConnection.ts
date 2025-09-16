@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Storage from "../../utils/storage";
 import { useUserEmail } from "../useUserEmail";
 import { useChatSocket } from "../socket/useChatSocket";
@@ -16,6 +16,7 @@ import {
 import { useParticipantsHandler } from "./handlers/useParticipantsHandler";
 import { useResultHandler } from "./handlers/useResultHandlers";
 import { parseMapMessage } from "../../utils/chat/parseMapMessage";
+import type { ApiMember } from "../../types/chat/members";
 
 export function useChatConnection(roomId: number) {
   const safeRoomId = Number.isFinite(roomId) && roomId > 0 ? roomId : 0;
@@ -56,6 +57,8 @@ export function useChatConnection(roomId: number) {
     chatRoomDetail?.data?.currentSize ?? 0
   );
 
+  const [coordinates, setCoordinates] = useState<ApiMember[]>([]);
+
   useEffect(() => {
     if (chatHistory?.data && email) {
       setMessages(mapChatHistoryToMessages(chatHistory.data, email));
@@ -67,7 +70,31 @@ export function useChatConnection(roomId: number) {
 
   const handleMapMessage = (raw: any) => {
     const parsed = parseMapMessage(raw);
-      if (!parsed) return;
+    if (!parsed) return;
+
+    setCoordinates((prev) => {
+      const exists = prev.some((m) => m.email === parsed.email);
+      if (exists) {
+        return prev.map((m) =>
+          m.email === parsed.email
+            ? { ...m, latitude: parsed.latitude, longitude: parsed.longitude, distance: parsed.distance }
+            : m
+        );
+      } else {
+        return [
+          ...prev,
+          {
+            roomId: safeRoomId,
+            email: parsed.email,
+            name: parsed.name,
+            nickname: parsed.nickname,
+            latitude: parsed.latitude,
+            longitude: parsed.longitude,
+            distance: parsed.distance,
+          },
+        ];
+      }
+    });
   };
 
   const token = Storage.getAccessToken() ?? "";
@@ -80,7 +107,7 @@ export function useChatConnection(roomId: number) {
       (raw) => handleReadyMessage(parseReadyMessage(raw)), // ready
       undefined, // system
       (raw) => handleParticipantsMessage(raw), // participants
-      (raw) => handleMapMessage(raw), 
+      (raw) => handleMapMessage(raw), // map
       (raw) => handleResultMessage(raw) // result
     );
 
@@ -103,10 +130,11 @@ export function useChatConnection(roomId: number) {
     nicknameMap,
     hostEmail,
     hostNickname,
-    chatRoomDetail: chatRoomDetail?.data ?? null, 
+    chatRoomDetail: chatRoomDetail?.data ?? null,
     refetchChatRoomDetail,
     isLoading,
     isError,
     status,
+    coordinates, 
   };
 }

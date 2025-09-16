@@ -30,7 +30,7 @@ const HomePage = () => {
 
   return (
     <div className="w-full h-screen flex flex-col bg-[#FAFAFA]">
-      <div className="sticky top-0 z-50">
+      <div className="sticky top-0 z-50 bg-[#FEFEFE]">
         <CategoryTab direction={direction} setDirection={setDirection} />
       </div>
 
