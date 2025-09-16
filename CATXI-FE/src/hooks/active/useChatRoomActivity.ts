@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { usePWAActivity } from '../fcm/usePWAActivity.ts';
 import activeStatusService from "../../services/ActiveStatusService";
 import { sendBeaconOnUnload } from "../../utils/beacon";
+import { useEffect, useRef } from "react";
 
 interface Options {
   roomId: number | null;
@@ -8,6 +9,12 @@ interface Options {
 }
 
 export const useChatRoomActivity = ({ roomId, inactiveThreshold = 30000 }: Options) => {
+  const isPWA = activeStatusService.isPWAInstalled();
+
+  if (isPWA) {
+    return usePWAActivity({ roomId, inactiveThreshold });
+  }
+
   const timeoutRef = useRef<number | null>(null);
   const isActiveRef = useRef(true);
 
