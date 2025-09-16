@@ -9,7 +9,7 @@ export interface ActiveStatusRequest {
 class ActiveStatusService {
   private currentRoomId: number | null = null;
   private isActive = false;
-  private queue = new ActiveStatusQueue(async (req) => {
+  public queue = new ActiveStatusQueue(async (req) => {
     return this.updateActiveStatus(req.roomId, req.isActive);
   });
 
@@ -39,6 +39,53 @@ class ActiveStatusService {
       this.queue.enqueue(req);
     }
   }
+  
+  async updateActiveStatusWithRetry(roomId: number, isActive: boolean, retryCount = 3): Promise<void> {
+    for (let i = 0; i < retryCount; i++) {
+      try {
+        await this.updateActiveStatus(roomId, isActive);
+        return;
+      } catch (error) {
+        console.warn(`⚠️ 상태 업데이트 시도 ${i + 1}/${retryCount} 실패:`, error);
+
+        if (i === retryCount - 1) {
+          const req: ActiveStatusRequest = { roomId, isActive };
+          this.queue.enqueue(req);
+          throw error;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, Math.pow(2, i) * 1000));
+      }
+    }
+  }
+
+  isOnline(): boolean {
+    return navigator.onLine && this.queue.getOnlineStatus();
+  }
+
+  isPWAInstalled(): boolean {
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true || 
+      document.referrer.includes("android-app://")
+    );
+  }
+
+  async forceSyncActiveStatus(roomId: number): Promise<void> {
+    if (!this.isOnline()) {
+      console.log("🔄 오프라인 상태 - 동기화 연기");
+      return;
+    }
+
+    try {
+      await this.updateActiveStatusWithRetry(roomId, true);
+      this.currentRoomId = roomId;
+      this.isActive = true;
+      console.log(`🔄 강제 동기화 완료: Room=${roomId}, Active=true`);
+    } catch (error) {
+      console.error("❌ 강제 동기화 실패:", error);
+    }
+  }
 
   enterRoom(roomId: number) {
     return this.updateActiveStatus(roomId, true);
@@ -52,6 +99,7 @@ class ActiveStatusService {
   getCurrentRoomId() {
     return this.currentRoomId;
   }
+
   getIsActive() {
     return this.isActive;
   }

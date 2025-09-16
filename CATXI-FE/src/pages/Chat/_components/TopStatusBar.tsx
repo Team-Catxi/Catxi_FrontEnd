@@ -38,12 +38,14 @@ const TopStatusBar = () => {
   const statusColor = status ? statusColorMap[status] : '#D1D5DB';
   const isHost = myEmail === chatRoom?.hostEmail;
 
-  const clearChatCache = (id: number) => {
+  const clearChatCache = async (id: number) => {
     queryClient.removeQueries({ queryKey: ['chatRoomDetail', id] });
     queryClient.removeQueries({ queryKey: ['chatMessages', id] });
     queryClient.removeQueries({ queryKey: ['participants', id] });
-    queryClient.removeQueries({ queryKey: ['myChatRoomId'] }); 
-    queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
+    queryClient.removeQueries({ queryKey: ['myChatRoomId'] });
+
+    await queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
+    await queryClient.refetchQueries({ queryKey: ['chatRooms'] });
   };
 
   const handleViewLocation = () => {
@@ -54,19 +56,16 @@ const TopStatusBar = () => {
     }
   };
 
-
   const handleLeave = () => {
     if (!roomId) return;
     openModal(
       <LeaveRoomModal
         onConfirm={() => {
           leaveRoom(Number(roomId), {
-            onSuccess: () => {
+            onSuccess: async () => {
               closeModal();
-              setTimeout(() => {
-                clearChatCache(Number(roomId));
-                navigate('/home');
-              }, 0);
+              await clearChatCache(Number(roomId)); 
+              navigate('/home');
             },
             onError: () => {
               closeModal();
@@ -87,12 +86,10 @@ const TopStatusBar = () => {
         type="delete"
         onConfirm={() => {
           deleteRoom(Number(roomId), {
-            onSuccess: () => {
+            onSuccess: async () => {
               closeModal();
-              setTimeout(() => {
-                clearChatCache(Number(roomId));
-                navigate('/home');
-              }, 0);
+              await clearChatCache(Number(roomId));
+              navigate('/home');
             },
             onError: () => {
               closeModal();
