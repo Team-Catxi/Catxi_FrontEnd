@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react"; // [ADDED] useCallback 추가
+import { useEffect, useState, useCallback } from "react"; 
 import { useQueryClient } from "@tanstack/react-query";
 import { Map } from "./_components/Map";
 import MemberCard from "./_components/MemberCard";
@@ -42,7 +42,7 @@ const MapView = ({
   const { data } = useMapGet(roomId);
   const queryClient = useQueryClient();
   const { setHidden } = useTabBar();
-  const { location, error: _locationError } = useKakaoLocation();
+  const { location } = useKakaoLocation();
 
   const members: ApiMember[] = Array.isArray(data?.data?.coordinates)
     ? data!.data!.coordinates
@@ -101,47 +101,52 @@ const MapView = ({
     },
     []
   );
-
+  
   useEffect(() => {
     if (status !== "connected" || !location) return;
 
-    const me = members.find((m) => m.email === myEmail);
+    const interval = setInterval(() => {
+      const me = members.find((m) => m.email === myEmail);
 
-    sendCoordinate({
-      roomId,
-      email: myEmail,
-      name: me?.name ?? "",
-      nickname: me?.nickname ?? "",
-      latitude: location.latitude,
-      longitude: location.longitude,
-    });
-
-    queryClient.setQueryData(["mapGet", roomId], (old: any) => {
-      if (!old?.data) return old;
-      const updatedCoords = old.data.coordinates.map((m: ApiMember) =>
-        m.email === myEmail
-          ? { ...m, latitude: location.latitude, longitude: location.longitude }
-          : m
-      );
-      return {
-        ...old,
-        data: {
-          ...old.data,
-          coordinates: updatedCoords,
-        },
+      const payload = {
+        roomId,
+        email: myEmail,
+        name: me?.name ?? "",
+        nickname: me?.nickname ?? "",
+        latitude: location.latitude,
+        longitude: location.longitude,
       };
-    });
 
-    console.log(
-      "좌표 전송 & 즉시 반영됨:",
-      location.latitude,
-      location.longitude
-    );
+      sendCoordinate(payload);
+
+      queryClient.setQueryData(["mapGet", roomId], (old: any) => {
+        if (!old?.data) return old;
+        const exists = old.data.coordinates.some(
+          (m: ApiMember) => m.email === myEmail
+        );
+        const updatedCoords = exists
+          ? old.data.coordinates.map((m: ApiMember) =>
+              m.email === myEmail ? payload : m
+            )
+          : [...old.data.coordinates, payload];
+
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            coordinates: updatedCoords,
+          },
+        };
+      });
+
+      console.log("좌표 주기적 전송 + 즉시 반영:", payload);
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [status, location, roomId, myEmail, members, sendCoordinate, queryClient]);
 
   return (
     <div className="absolute inset-0">
-      {/* 지도 */}
       <div className="absolute inset-0 z-0">
         <Map
           initialCenter={departureCoords}
@@ -151,7 +156,6 @@ const MapView = ({
       </div>
 
       <div className="absolute inset-0 z-10 pointer-events-none">
-        {/* 상단 헤더 */}
         <div
           aria-label="헤더"
           className="absolute pointer-events-auto top-5 left-0 right-0 flex justify-between items-center px-[1.5rem] z-30 "
@@ -162,7 +166,7 @@ const MapView = ({
             onFocus={focusToCoords}
           />
         </div>
-        {/*마커 레이어*/}
+
         {mapReady && (
           <LocationLayer
             members={members}
@@ -177,7 +181,6 @@ const MapView = ({
           <DepartureLayer departureKey={departureKey} onFocus={focusToCoords} />
         )}
 
-        {/* 하단 멤버 카드 */}
         <div className="absolute z-100 bottom-5 left-0 right-0 px-4 pointer-events-auto">
           <MemberCard
             members={members}
