@@ -17,7 +17,8 @@ export const Stations = {
   BUCHEON_ST: 'BUCHEON_ST',
   YEOKGOK_ST: 'YEOKGOK_ST',
   GURO_ST: 'GURO_ST',
-  SINDORIM_ST: 'SINDORIM_ST'
+  SINDORIM_ST: 'SINDORIM_ST',
+  STUDENT_CENTER: 'STUDENT_CENTER'
 } as const;
 
 export type ChatRoomStatus = typeof ChatRoomStatus[keyof typeof ChatRoomStatus];
