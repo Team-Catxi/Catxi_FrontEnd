@@ -17,6 +17,7 @@ import { useParticipantsHandler } from "./handlers/useParticipantsHandler";
 import { useResultHandler } from "./handlers/useResultHandlers";
 import { parseMapMessage } from "../../utils/chat/parseMapMessage";
 import type { ApiMember } from "../../types/chat/members";
+import { useQueryClient } from "@tanstack/react-query"; // [추가] React Query 클라이언트 사용을 위해 import
 
 export function useChatConnection(roomId: number) {
   const safeRoomId = Number.isFinite(roomId) && roomId > 0 ? roomId : 0;
@@ -47,7 +48,8 @@ export function useChatConnection(roomId: number) {
     );
   }, [chatRoomDetail, hostEmail]);
 
-  const { messages, setMessages, handleMessage } = useChatMessagesHandler(email);
+  const { messages, setMessages, handleMessage } =
+    useChatMessagesHandler(email);
 
   const { handleReadyMessage } = useReady(
     safeRoomId,
@@ -58,6 +60,8 @@ export function useChatConnection(roomId: number) {
   );
 
   const [coordinates, setCoordinates] = useState<ApiMember[]>([]);
+
+  const queryClient = useQueryClient(); // [추가] React Query 클라이언트 인스턴스
 
   useEffect(() => {
     if (chatHistory?.data && email) {
@@ -77,7 +81,12 @@ export function useChatConnection(roomId: number) {
       if (exists) {
         return prev.map((m) =>
           m.email === parsed.email
-            ? { ...m, latitude: parsed.latitude, longitude: parsed.longitude, distance: parsed.distance }
+            ? {
+                ...m,
+                latitude: parsed.latitude,
+                longitude: parsed.longitude,
+                distance: parsed.distance,
+              }
             : m
         );
       } else {
@@ -94,6 +103,40 @@ export function useChatConnection(roomId: number) {
           },
         ];
       }
+    });
+
+    // [추가] 서버에서 받은 좌표를 React Query 캐시(["mapGet", roomId])에도 반영하여 MapView가 즉시 갱신되게 함
+    queryClient.setQueryData(["mapGet", safeRoomId], (old: any) => {
+      if (!old?.data) return old;
+
+      const incoming = {
+        roomId: safeRoomId,
+        email: parsed.email,
+        name: parsed.name ?? "",
+        nickname: parsed.nickname ?? "",
+        latitude: parsed.latitude,
+        longitude: parsed.longitude,
+        distance: parsed.distance,
+      };
+
+      const list = Array.isArray(old.data.coordinates)
+        ? old.data.coordinates
+        : [];
+      const exists = list.some((m: any) => m.email === incoming.email);
+
+      const updated = exists
+        ? list.map((m: any) =>
+            m.email === incoming.email ? { ...m, ...incoming } : m
+          )
+        : [...list, incoming];
+
+      return {
+        ...old,
+        data: {
+          ...old.data,
+          coordinates: updated,
+        },
+      };
     });
   };
 
@@ -135,6 +178,6 @@ export function useChatConnection(roomId: number) {
     isLoading,
     isError,
     status,
-    coordinates, 
+    coordinates,
   };
 }
