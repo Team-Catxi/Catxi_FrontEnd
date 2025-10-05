@@ -85,6 +85,10 @@ export default function LocationLayer({
     };
   }, [recompute]);
 
+  useEffect(() => {
+    recompute();
+  }, [recompute, validMembers]);
+
   return (
     <div
       className={`absolute inset-0 ${className}`}
