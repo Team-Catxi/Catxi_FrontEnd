@@ -35,6 +35,12 @@ export interface ChatMessageItem {
   sentAt: string;
 };
 
+export interface ChatMessagePageData {
+  messages: ChatMessageItem[];
+  nextCursor: number | null;
+  hasNext: boolean;
+}
+
 export interface ChatRoomItem {
     roomId: number;
     hostId: number;
@@ -63,7 +69,7 @@ export interface ChatRoomData {
   myRoomId: number;
   rooms: ChatRoomList;
 }
- 
-export type ChatMessagesResponse = ApiResponse<ChatMessageItem[]>;
+
+export type ChatMessagesResponse = ApiResponse<ChatMessagePageData>;
 
 export type ChatRoomResponse = ApiResponse<ChatRoomData>;

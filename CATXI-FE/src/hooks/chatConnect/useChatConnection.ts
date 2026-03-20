@@ -60,8 +60,8 @@ export function useChatConnection(roomId: number) {
   const [coordinates, setCoordinates] = useState<ApiMember[]>([]);
 
   useEffect(() => {
-    if (chatHistory?.data && email) {
-      setMessages(mapChatHistoryToMessages(chatHistory.data, email));
+    if (chatHistory?.data?.messages && email) {
+      setMessages(mapChatHistoryToMessages(chatHistory.data.messages, email));
     }
   }, [chatHistory, email, setMessages]);
 
